@@ -1,0 +1,12 @@
+spring:
+  application.name: openapi-generator-by-tags
+  main.banner-mode: off
+  shell:
+    history:
+      enabled: false
+
+application:
+  apis:
+    - name: core
+      file: openapi/core.yml
+      prefix: core

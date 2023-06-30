@@ -1,0 +1,31 @@
+{
+  "groups": [
+    {
+      "name": "services",
+      "type": "ru.romanow.openapi.tags.config.properties.ApplicationProperties",
+      "sourceType": "ru.romanow.openapi.tags.config.properties.ApplicationProperties`"
+    }
+  ],
+  "properties": [
+    {
+      "name": "application.apis",
+      "type": "java.util.List<ru.romanow.openapi.tags.config.properties.ApplicationProperties>",
+      "description": "OpenAPI declarations."
+    },
+    {
+      "name": "application.apis[0].name",
+      "type": "java.lang.String",
+      "description": "API name."
+    },
+    {
+      "name": "application.apis[0].file",
+      "type": "org.springframework.core.io.ClassPathResource",
+      "description": "OpenAPI file path."
+    },
+    {
+      "name": "application.apis[0].prefix",
+      "type": "java.lang.String",
+      "description": "API prefix."
+    }
+  ]
+}

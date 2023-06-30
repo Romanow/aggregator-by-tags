@@ -1,0 +1,61 @@
+plugins {
+    id "idea"
+    id "org.jetbrains.kotlin.jvm" version "1.7.10"
+    id "org.jetbrains.kotlin.plugin.spring" version "1.7.10"
+    id "org.springframework.boot" version "3.1.1"
+    id "io.spring.dependency-management" version "1.1.0"
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+ext {
+    springBootVersion = "3.1.1"
+    springShellVersion = "2.1.8"
+    testCntainerVersion = "1.16.0"
+}
+
+ext {
+    openApiVersion = "2.1.0"
+}
+
+[compileKotlin, compileTestKotlin]*.kotlinOptions*.jvmTarget = "17"
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
+        mavenBom "org.springframework.shell:spring-shell-dependencies:$springShellVersion"
+    }
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.springframework.shell:spring-shell-starter"
+    implementation "org.springframework.boot:spring-boot-starter-logging"
+
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-api:$openApiVersion"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+bootJar {
+    archiveFileName = "${project.name}.jar"
+}

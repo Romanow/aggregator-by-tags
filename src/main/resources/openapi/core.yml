@@ -1,0 +1,5022 @@
+openapi: 3.0.1
+info:
+  title: 1555.calm-core-s-rest-v1
+  description: Разработка СУБО Калькулятор ALM 2.0 для динамического моделирования баланса в целях оптимизации структуры баланса и максимизации доходности Группы ВТБ
+  contact:
+    name: Брезгин Антон
+    url: https://wiki.corp.dev.vtb/pages/viewpage.action?pageId=143006280
+    email: abrezgin@vtb.ru
+  version: 1.0.0
+servers:
+  - url: http://localhost:8030
+    description: Generated server url
+security:
+  - EpaAuth: []
+tags:
+  - name: Balance cf product
+    description: Balance cf product
+  - name: Balance report
+    description: Balance report
+  - name: Calculation Drafts
+    description: Calculation Drafts
+  - name: Calculation Period
+    description: Calculation Period
+  - name: Macro
+    description: Macro
+  - name: Draft Macro
+    description: Draft Macro
+  - name: Характеристики черновика
+    description: Характеристики черновика
+  - name: Product scenario
+    description: Product scenario
+  - name: Product scenario draft
+    description: Product scenario draft
+  - name: Transfer Rate
+    description: Transfer Rate
+  - name: Transfer Rate Draft
+    description: Transfer Rate Draft
+  - name: Calculation - cash flow
+    description: Calculation - cash flow
+  - name: Calculation Version - cash flow
+    description: Calculation Version - cash flow
+  - name: Calculation - derivatives models
+    description: Calculation - derivatives models
+  - name: Calculation Version - derivatives models
+    description: Calculation Version - derivatives models
+  - name: Доп. параметры и НСИ
+    description: Доп. параметры и НСИ
+  - name: Черновик доп. параметров и НСИ
+    description: Черновик доп. параметров и НСИ
+  - name: Calculation - risk
+    description: Calculation - risk
+  - name: Calculation Version - risk
+    description: Calculation Version - risk
+  - name: Calculation - stability rates
+    description: Calculation - stability rates
+  - name: Calculation Version - stability rates
+    description: Calculation Version - stability rates
+  - name: Calculation - vssdv
+    description: Calculation - vssdv
+  - name: Calculation Version - vssdv
+    description: Calculation Version - vssdv
+paths:
+  /api/v1/product-scenario/characteristic/individual:
+    get:
+      tags:
+        - Характеристики черновика
+      summary: Список индивидуальных характеристик
+      description: Список индивидуальных характеристик
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioCharacteristicController#getIndividualCharacteristic(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Список индивидуальных характеристик
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/IndividualCharacteristic'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+    put:
+      tags:
+        - Характеристики черновика
+      summary: Обновление индивидуальных характеристик
+      description: Обновление индивидуальных характеристик
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioCharacteristicController#updateIndividualCharacteristic(UUID,List)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              maxItems: 2147483647
+              type: array
+              additionalProperties: false
+              items:
+                $ref: '#/components/schemas/IndividualCharacteristic'
+        required: true
+      responses:
+        '200':
+          description: Обновление индивидуальных характеристик
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/product-scenario/characteristic/general:
+    get:
+      tags:
+        - Характеристики черновика
+      summary: Список общих характеристик
+      description: Список общих характеристик
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioCharacteristicController#getBasicCharacteristic(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Список общих характеристик
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralCharacteristic'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+    put:
+      tags:
+        - Характеристики черновика
+      summary: Обновление общих характеристик
+      description: Обновление общих характеристик
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioCharacteristicController#updateBasicCharacteristic(UUID,GeneralCharacteristic)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeneralCharacteristic'
+        required: true
+      responses:
+        '200':
+          description: Обновление общих характеристик
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/vssdv/calculation:
+    post:
+      tags:
+        - Calculation - vssdv
+      summary: Создать расчет
+      description: Создать расчет
+      operationId: ru.vtb.calm.subo.web.rest.vssdv.VssdvCalculationController#create(VssdvCalculationCreateRequest)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VssdvCalculationCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Расчет успешно создан
+          headers:
+            Location:
+              description: Ссылка на созданный расчет
+              style: simple
+              schema:
+                maxLength: 100
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/VssdvCalculation'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ошибка запроса к Data Preparation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALC_VSSDV_CREATE
+  /api/v1/vssdv/calculation-version:
+    get:
+      tags:
+        - Calculation Version - vssdv
+      summary: Получить список всех версий расчетов с пагинацией
+      description: Получить список всех версий расчетов с пагинацией
+      operationId: ru.vtb.calm.subo.web.rest.vssdv.VssdvCalculationVersionController#findAll(Pageable)
+      parameters:
+        - name: pageable
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+        - name: page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: Индекс страницы с отсчетом от нуля (0..N)
+            default: 0
+        - name: size
+          in: query
+          schema:
+            maxLength: 100
+            type: string
+            description: Размер возвращаемой страницы
+            default: '0'
+      responses:
+        '200':
+          description: Список всех расчетов с пагинацией
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/VssdvCalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_CALCVERSION_VSSDV_GET_ALL
+    post:
+      tags:
+        - Calculation Version - vssdv
+      summary: Создать версию расчета
+      description: Создать версию расчета
+      operationId: ru.vtb.calm.subo.web.rest.vssdv.VssdvCalculationVersionController#createVersion(UUID,VssdvCalculationVersionCreateRequest,String)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VssdvCalculationVersionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Версия успешно создана
+          headers:
+            Location:
+              description: Ссылка на созданную версию расчета
+              style: simple
+              schema:
+                maxLength: 100
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/VssdvCalculationVersion'
+        '400':
+          description: Версия расчета уже существует
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALCVERSION_VSSDV_CREATE
+  /api/v1/vssdv/calculation-version/finish:
+    post:
+      tags:
+        - Calculation Version - vssdv
+      summary: Окончание расчета
+      description: Окончание расчета
+      operationId: ru.vtb.calm.subo.web.rest.vssdv.VssdvCalculationVersionController#finishCalculation(UUID,RequestBodyPlug)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/VssdvCalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALCVERSION_VSSDV_FINISH
+  /api/v1/vssdv/calculation-version/calculation-corrected:
+    post:
+      tags:
+        - Calculation Version - vssdv
+      summary: 'Запуск корректироки расчета '
+      description: Запуск корректировки расчета
+      operationId: ru.vtb.calm.subo.web.rest.vssdv.VssdvCalculationVersionController#startCorrection(UUID,VssdvCorrectionRequest,String)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: Authorization
+          in: header
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VssdvCorrectionRequest'
+        required: true
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/VssdvCalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALCVERSION_VSSDV_CORRECT
+  /api/v1/stability-rates/calculation:
+    post:
+      tags:
+        - Calculation - stability rates
+      summary: Создать расчет
+      description: Создать расчет
+      operationId: ru.vtb.calm.subo.web.rest.stabilityrates.StabilityRatesCalculationController#create(StabilityRatesCalculationCreateRequest)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StabilityRatesCalculationCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Расчет успешно создан
+          headers:
+            Location:
+              description: Ссылка на созданный расчет
+              style: simple
+              schema:
+                maxLength: 100
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Calculation'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ошибка запроса к Data Preparation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALC_STABILITY_RATES_CREATE
+  /api/v1/stability-rates/calculation-version:
+    get:
+      tags:
+        - Calculation Version - stability rates
+      summary: Получить список всех версий расчетов с пагинацией
+      description: Получить список всех версий расчетов с пагинацией
+      operationId: ru.vtb.calm.subo.web.rest.stabilityrates.StabilityRatesCalculationVersionController#findAll(Pageable)
+      parameters:
+        - name: pageable
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+        - name: page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: Индекс страницы с отсчетом от нуля (0..N)
+            default: 0
+        - name: size
+          in: query
+          schema:
+            maxLength: 100
+            type: string
+            description: Размер возвращаемой страницы
+            default: '0'
+      responses:
+        '200':
+          description: Список всех расчетов с пагинацией
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/StabilityRatesCalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_CALCVERSION_STABILITY_RATES_GET_ALL
+    post:
+      tags:
+        - Calculation Version - stability rates
+      summary: Создать версию расчета
+      description: Создать версию расчета
+      operationId: ru.vtb.calm.subo.web.rest.stabilityrates.StabilityRatesCalculationVersionController#createVersion(UUID,StabilityRatesCalculationVersionCreateRequest)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StabilityRatesCalculationVersionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Версия успешно создана
+          headers:
+            Location:
+              description: Ссылка на созданную версию расчета
+              style: simple
+              schema:
+                maxLength: 100
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculationVersion'
+        '400':
+          description: Версия расчета уже существует
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALCVERSION_STABILITY_RATES_CREATE
+  /api/v1/stability-rates/calculation-version/finish:
+    post:
+      tags:
+        - Calculation Version - stability rates
+      summary: Окончание расчета
+      description: Окончание расчета
+      operationId: ru.vtb.calm.subo.web.rest.stabilityrates.StabilityRatesCalculationVersionController#finishCalculation(UUID,RequestBodyPlug)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/StabilityRatesCalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALCVERSION_STABILITY_RATES_FINISH
+  /api/v1/stability-rates/calculation-version/calculation-corrected:
+    post:
+      tags:
+        - Calculation Version - stability rates
+      summary: Запуск пересчет расчета после корректировки
+      description: Запуск пересчет расчета после корректировки
+      operationId: ru.vtb.calm.subo.web.rest.stabilityrates.StabilityRatesCalculationVersionController#startRecalculation(UUID,StabilityRatesRecalculationRequest)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StabilityRatesRecalculationRequest'
+        required: true
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/StabilityRatesCalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALCVERSION_STABILITY_RATES_RECALCULATE
+  /api/v1/rrbk-cf/calculation:
+    get:
+      tags:
+        - Calculation - risk
+      summary: Получить список всех расчетов с пагинацией
+      description: Получить список всех расчетов с пагинацией
+      operationId: ru.vtb.calm.subo.web.rest.risk.RiskCalculationController#findAll(Pageable)
+      parameters:
+        - name: pageable
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+        - name: page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: Индекс страницы с отсчетом от нуля (0..N)
+            default: 0
+        - name: size
+          in: query
+          schema:
+            maxLength: 100
+            type: string
+            description: Размер возвращаемой страницы
+            default: '0'
+      responses:
+        '200':
+          description: Список всех расчетов с пагинацией
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/RiskCalculation'
+      x-security:
+        permission: RRBK_CALCULATION_READ_SUPPORT
+      x-audit:
+        event: CALM_CORE_RISK_CALCLIST_VIEW
+    post:
+      tags:
+        - Calculation - risk
+      summary: Создать расчет
+      description: Создать расчет
+      operationId: ru.vtb.calm.subo.web.rest.risk.RiskCalculationController#create(RiskCalculationCreateRequest)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskCalculationCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Расчет успешно создан
+          headers:
+            Location:
+              description: Ссылка на созданный расчет
+              style: simple
+              schema:
+                maxLength: 100
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RiskCalculation'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: RRBK_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALC_RISK_CREATE
+  /api/v1/rrbk-cf/calculation-version/cancelling/{calculationVersionUid}:
+    post:
+      tags:
+        - Calculation Version - risk
+      summary: Остановить расчет сценария
+      description: Остановить расчет сценария
+      operationId: ru.vtb.calm.subo.web.rest.risk.RiskCalculationVersionController#cancelCalculation(RequestBodyPlug,UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Расчет сценария успешно остановлен
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: false
+      x-security:
+        permission: RRBK_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_RISK_CALCVERSION_CANCELLED
+  /api/v1/rrbk-cf/calculation-version/answer-from-drp:
+    post:
+      tags:
+        - TYK
+        - Calculation Version - risk
+      summary: Получение ответа от DRP
+      description: Получение ответа от DRP
+      operationId: ru.vtb.calm.subo.web.rest.risk.RiskCalculationVersionController#answerFromCf(SrrbkAirflowResponse)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SrrbkAirflowResponse'
+        required: true
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RiskCalculationVersion'
+  /api/v1/product-scenario/characteristic/recover-to-general:
+    post:
+      tags:
+        - Характеристики черновика
+      summary: Сбросить до общих характеристик
+      description: Сбросить до общих характеристик
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioCharacteristicController#recoverCharacteristics(UUID,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Характеристик сбросшены до общих
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/derivatives-models/calculation:
+    post:
+      tags:
+        - Calculation - derivatives models
+      summary: Создать расчет
+      description: Создать расчет
+      operationId: ru.vtb.calm.subo.web.rest.derivatives.DerivativesModelsCalculationController#create(DerivativesModelsCalculationCreateRequest)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DerivativesModelsCalculationCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Расчет успешно создан
+          headers:
+            Location:
+              description: Ссылка на созданный расчет
+              style: simple
+              schema:
+                maxLength: 100
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Calculation'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ошибка запроса к Data Preparation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALC_DERIVATIVES_MODELS_CREATE
+  /api/v1/derivatives-models/calculation-version/data-prepared:
+    post:
+      tags:
+        - Calculation Version - derivatives models
+      summary: Запуск расчёта в стейт машине
+      description: Запуск расчёта в стейт машине
+      operationId: ru.vtb.calm.subo.web.rest.derivatives.DerivativesModelsCalculationVersionController#startCalculation(UUID,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DerivativesModelsCalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALC_DERIVATIVES_MODELS_START
+  /api/v1/derivatives-models/calculation-version/batch:
+    post:
+      tags:
+        - Calculation Version - derivatives models
+      summary: Создать версии расчета
+      description: Создать версии расчета
+      operationId: ru.vtb.calm.subo.web.rest.derivatives.DerivativesModelsCalculationVersionController#createVersions(UUID,DerivativesModelsCalculationVersionCreateRequest)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DerivativesModelsCalculationVersionCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: Версия успешно создана
+          headers:
+            Location:
+              description: Ссылка на созданную версию расчета
+              style: simple
+              schema:
+                maxLength: 100
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculationVersion'
+        '400':
+          description: Версия расчета уже существует
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALCVERSIONS_DERIVATIVES_MODELS_CREATE
+  /api/v1/derivatives-models/calculation-version/answer-from-drp:
+    post:
+      tags:
+        - Calculation Version - derivatives models
+        - TYK
+      summary: Получение ответа от DRP
+      description: Получение ответа от DRP
+      operationId: ru.vtb.calm.subo.web.rest.derivatives.DerivativesModelsCalculationVersionController#answerFromCf(VssdvAirflowResponse)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VssdvAirflowResponse'
+        required: true
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculationVersion'
+  /api/v1/cashflow/health-check-answer-from-airflow:
+    post:
+      tags:
+        - TYK
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationHealthCheckController#receiveHealthCheckAnswerFromAirflow(AirflowHealthCheckResponse)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AirflowHealthCheckResponse'
+        required: true
+      responses:
+        '200':
+          description: OK
+  /api/v1/cashflow/calculation:
+    get:
+      tags:
+        - Calculation - cash flow
+      summary: Получить список всех расчетов с пагинацией
+      description: Получить список всех расчетов с пагинацией
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationController#findAll(Pageable)
+      parameters:
+        - name: pageable
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+        - name: page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: Индекс страницы с отсчетом от нуля (0..N)
+            default: 0
+        - name: size
+          in: query
+          schema:
+            maxLength: 100
+            type: string
+            description: Размер возвращаемой страницы
+            default: '0'
+      responses:
+        '200':
+          description: Список всех расчетов с пагинацией
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/Calculation'
+      x-audit:
+        event: CALM_CORE_CALCLIST_VIEW
+    post:
+      tags:
+        - Calculation - cash flow
+      summary: Создать расчет
+      description: Создать расчет
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationController#create(CashFlowCalculationCreateRequest)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashFlowCalculationCreateRequest'
+        required: true
+      responses:
+        '201':
+          description: Расчет успешно создан
+          headers:
+            Location:
+              description: Ссылка на созданный расчет
+              style: simple
+              schema:
+                maxLength: 100
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Calculation'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ошибка запроса к Data Preparation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALC_CREATE
+  /api/v1/cashflow/calculation-version:
+    get:
+      tags:
+        - Calculation Version - cash flow
+      summary: Получить версии расчета по id расчета
+      description: Получить версии расчета по id расчета
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationVersionController#getCalculationVersions(UUID,Pageable)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: pageable
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+        - name: page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: Индекс страницы с отсчетом от нуля (0..N)
+            default: 0
+        - name: size
+          in: query
+          schema:
+            maxLength: 100
+            type: string
+            description: Размер возвращаемой страницы
+            default: '0'
+      responses:
+        '200':
+          description: Версии расчета
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/CalculationVersion'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ_SUPPORT
+    post:
+      tags:
+        - Calculation Version - cash flow
+      summary: Создать версию расчета
+      description: Создать версию расчета
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationVersionController#createVersion(UUID,String,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: name
+          in: query
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Версия успешно создана
+          headers:
+            Location:
+              description: Ссылка на созданную версию расчета
+              style: simple
+              schema:
+                maxLength: 100
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculationVersion'
+        '400':
+          description: Версия расчета уже существует
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALCSTART
+  /api/v1/cashflow/calculation-version/answer-from-cf:
+    post:
+      tags:
+        - Calculation Version - cash flow
+        - TYK
+      summary: Получение ответа от Cash Flow
+      description: Получение ответа от Cash Flow
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationVersionController#answerFromCf(AirflowResponse)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AirflowResponse'
+        required: true
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculationVersion'
+  /api/v1/cash-flow/report/balance:
+    get:
+      tags:
+        - Balance report
+      summary: Получение отчета баланса по версии расчета
+      description: Получение отчета баланса по версии расчета
+      operationId: ru.vtb.calm.subo.web.rest.BalanceReportController#getBalanceReports(UUID)
+      parameters:
+        - name: solveId
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Отчет баланса получен
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/BalanceReport'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+    post:
+      tags:
+        - Balance report
+      summary: Создание отчета баланса для версии расчета
+      description: Создание отчета баланса для версии расчета
+      operationId: ru.vtb.calm.subo.web.rest.BalanceReportController#createReport(UUID,RequestBodyPlug)
+      parameters:
+        - name: solveId
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Отчет баланса создан успешно
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/calculation/drafts/transfer-rate/upload:
+    post:
+      tags:
+        - TYK
+        - Transfer Rate Draft
+      summary: Загрузить трансфертные ставки, связав с шаблоном расчета
+      description: Загрузить трансфертные ставки, связав с шаблоном расчета
+      operationId: ru.vtb.calm.subo.web.rest.TransferRateDraftController#sendXls(MultipartFile,UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - file
+              type: object
+              properties:
+                file:
+                  maxLength: 255
+                  type: string
+                  format: binary
+              additionalProperties: false
+      responses:
+        '200':
+          description: Трансфертные ставки успешно загружены для шаблона расчета
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Document'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTTS_UPLOAD
+  /api/v1/calculation/drafts/transfer-rate/fixation:
+    post:
+      tags:
+        - Transfer Rate Draft
+      summary: Фиксация черновика трансфертных ставок
+      description: Фиксация черновика трансфертных ставок
+      operationId: ru.vtb.calm.subo.web.rest.TransferRateDraftController#fixScenarioDraft(UUID,String,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: name
+          in: query
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Фиксация черновика трансфертных ставок прошла успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRateDraft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTTS_FIXATION
+  /api/v1/calculation/drafts/transfer-rate/clone/draft:
+    post:
+      tags:
+        - Transfer Rate Draft
+      summary: Заполнение черновика трасфертных ставок из указанной версии по uuid
+      description: Заполнение черновика трасфертных ставок из указанной версии по uuid прошла успешно
+      operationId: ru.vtb.calm.subo.web.rest.TransferRateDraftController#recoverDraftFromAnotherDraft(UUID,UUID,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: fromDraftId
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Заполнение черновика трасфертных ставок из указанной версии по uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRateDraft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTTS_CLONE
+  /api/v1/calculation/drafts/product-scenario/upload:
+    post:
+      tags:
+        - TYK
+        - Product scenario draft
+      summary: Загрузить продуктовый сценарий связав с шаблоном расчета
+      description: Загрузить продуктовый сценарий связав с шаблоном расчета
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#sendXls(MultipartFile,UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+      responses:
+        '200':
+          description: Продуктовый сценарий успешно загружен для шаблона расчета
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Document'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTPRODUCT_UPLOAD
+  /api/v1/calculation/drafts/product-scenario/fixation:
+    post:
+      tags:
+        - Product scenario draft
+      summary: Фиксация черновика продуктового сценария
+      description: Фиксация черновика продуктового сценария прошла успешно
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#fixationProductScenarioDraft(UUID,String,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: name
+          in: query
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Фиксация черновика продуктового сценария прошла успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Draft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTPRODUCT_FIXATION
+  /api/v1/calculation/drafts/product-scenario/clone/draft:
+    post:
+      tags:
+        - Product scenario draft
+      summary: Восстановление черновика продуктового сценария из указанной черновика
+      description: Восстановление черновика продуктового сценария из указанной черновика
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#recoverDraftFromAnotherDraft(UUID,UUID,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: fromDraftId
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Восстановление черновика продуктового сценария из другого черновика прошла успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Draft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTPRODUCT_CLONE
+  /api/v1/calculation/drafts/parameters/fixation:
+    post:
+      tags:
+        - Черновик доп. параметров и НСИ
+      summary: Фиксация черновика доп. параметров
+      description: Фиксация черновика доп. параметров
+      operationId: ru.vtb.calm.subo.web.rest.parameter.AdditionalParamDraftController#fixationProductScenarioDraft(UUID,String,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: name
+          in: query
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Фиксация черновика доп. параметров прошла успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdditionalParamDraft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFT_PARAMETERS_VERSION_FIXATION
+  /api/v1/calculation/drafts/parameters/clone/draft:
+    post:
+      tags:
+        - Черновик доп. параметров и НСИ
+      summary: Заполнение черновика доп.параметров из указанной версии
+      description: Заполнение черновика доп.параметров из указанной версии
+      operationId: ru.vtb.calm.subo.web.rest.parameter.AdditionalParamDraftController#recoverDraftFromAnotherDraft(UUID,UUID,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: fromDraftId
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Заполнение черновика доп.параметров из версии прошло успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdditionalParamDraft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFT_PARAMETERS_CLONE
+  /api/v1/calculation/drafts/macro/upload:
+    post:
+      tags:
+        - TYK
+        - Draft Macro
+      summary: Загрузить макро связав с шаблоном расчета
+      description: Загрузить макро связав с шаблоном расчета
+      operationId: ru.vtb.calm.subo.web.rest.MacroDraftController#uploadFile(MultipartFile,UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - file
+              type: object
+              properties:
+                file:
+                  maxLength: 255
+                  type: string
+                  format: binary
+              additionalProperties: false
+      responses:
+        '200':
+          description: Макро успешно загружен для шаблона расчета
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Document'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTMACRO_UPLOAD
+  /api/v1/calculation/drafts/macro/fixation:
+    post:
+      tags:
+        - Draft Macro
+      summary: Фиксация черновика макро
+      description: Фиксация черновика макро
+      operationId: ru.vtb.calm.subo.web.rest.MacroDraftController#fixDraft(UUID,String,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: name
+          in: query
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Фиксация черновика макро прошла успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MacroDraft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CDRAFTMACRO_FIXATION
+  /api/v1/calculation/drafts/macro/clone/draft:
+    post:
+      tags:
+        - Draft Macro
+      summary: Восстановление черновика макро сценария из указанной черновика
+      description: Восстановление черновика макро сценария из другого черновика прошла успешно
+      operationId: ru.vtb.calm.subo.web.rest.MacroDraftController#recoverDraftFromAnotherDraft(UUID,UUID,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: fromDraftId
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Восстановление черновика макро сценария из другого черновика прошла успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MacroDraft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTMACRO_CLONE
+  /api/v1/vssdv/calculation-version/name:
+    patch:
+      tags:
+        - Calculation Version - vssdv
+      summary: Обновить поле имени версии расчета по uid
+      description: Обновить поле имени версии расчета по uid
+      operationId: ru.vtb.calm.subo.web.rest.vssdv.VssdvCalculationVersionController#updateCalculationVersionName(VssdvUpdateCalculationNameRequest)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VssdvUpdateCalculationNameRequest'
+        required: true
+      responses:
+        '200':
+          description: Обновленная версия расчета
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/VssdvCalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_WRITE
+  /api/v1/cashflow/calculation/{calculationUid}:
+    get:
+      tags:
+        - Calculation - cash flow
+      summary: Получить расчет по UID
+      description: Получить расчет по UID
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationController#findByUid(UUID)
+      parameters:
+        - name: calculationUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Расчет
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calculation'
+        '404':
+          description: Запись не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ_SUPPORT
+      x-audit:
+        event: CALM_CORE_CALC_VIEW
+    patch:
+      tags:
+        - Calculation - cash flow
+      summary: Обновить данные расчета
+      description: Обновить данные расчета
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationController#update(UUID,CalculationUpdateRequest)
+      parameters:
+        - name: calculationUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculationUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Calculation'
+        '404':
+          description: Запись не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALC_EDIT
+  /api/v1/calculation/drafts/transfer-rate/clear:
+    patch:
+      tags:
+        - Transfer Rate Draft
+      summary: Очистить черновик трансфертных ставок
+      description: Очистить черновик трансфертных ставок
+      operationId: ru.vtb.calm.subo.web.rest.TransferRateDraftController#clear(UUID,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Черновик трансфертных ставок успешно очищен
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTTS_CLEAR
+  /api/v1/calculation/drafts/product-scenario/clear:
+    patch:
+      tags:
+        - Product scenario draft
+      summary: Очистить черновик продуктового сценария
+      description: Очистить черновик продуктового сценария в соответствии с параметром mode
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#clear(UUID,ProductGenerateFileMode,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: mode
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            type: string
+            enum:
+              - ALL
+              - NOT_WEIGHT
+              - WEIGHT
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Черновик продуктового сценария успешно очищен
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTPRODUCT_CLEAR
+  /api/v1/calculation/drafts/parameters:
+    get:
+      tags:
+        - Черновик доп. параметров и НСИ
+      summary: Получить текущее состояние черновика доп. параметров
+      description: Получить текущее состояние черновика доп. параметров
+      operationId: ru.vtb.calm.subo.web.rest.parameter.AdditionalParamDraftController#getCurrentScenarioDraft(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Текущее состояние черновика доп. параметров
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/AdditionalParamDraftDetail'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFT_PARAMETERS_VIEW
+    patch:
+      tags:
+        - Черновик доп. параметров и НСИ
+      summary: Обновление доп. параметра
+      description: Обновление доп. параметра
+      operationId: ru.vtb.calm.subo.web.rest.parameter.AdditionalParamDraftController#updateAdditionalParamDetail(AdditionalParamUpdateRequest)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdditionalParamUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: Обновление доп. параметра
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/AdditionalParamDraftDetail'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFT_PARAMETERS_FIXATION
+  /api/v1/calculation/drafts/macro/clear:
+    patch:
+      tags:
+        - Draft Macro
+      summary: Очистить черновик макро
+      description: Очистить черновик макро
+      operationId: ru.vtb.calm.subo.web.rest.MacroDraftController#clear(UUID,RequestBodyPlug)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestBodyPlug'
+        required: true
+      responses:
+        '200':
+          description: Черновик макро успешно очищен
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTMACRO_CLEAR
+  /api/v1/vssdv/calculation/{calculationUid}:
+    get:
+      tags:
+        - Calculation - vssdv
+      summary: Получить расчет по UID
+      description: Получить расчет по UID
+      operationId: ru.vtb.calm.subo.web.rest.vssdv.VssdvCalculationController#findByUid(UUID)
+      parameters:
+        - name: calculationUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Расчет
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VssdvCalculation'
+        '404':
+          description: Запись не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: VSSDV_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_CALC_VSSDV_GET
+  /api/v1/vssdv/calculation-version/{calculationVersionUid}:
+    get:
+      tags:
+        - Calculation Version - vssdv
+      summary: Получить версию расчета по id
+      description: Получить версию расчета по id
+      operationId: ru.vtb.calm.subo.web.rest.vssdv.VssdvCalculationVersionController#findCalculationVersion(UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Версии расчета
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/VssdvCalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_CALCVERSION_VSSDV_GET
+  /api/v1/transfer-rate/rows/search:
+    get:
+      tags:
+        - Transfer Rate
+      summary: Поиск данных версии трансфертных ставок
+      description: Поиск данных версии трансфертных ставок
+      operationId: ru.vtb.calm.subo.web.rest.TransferRateController#search(UUID,String,String)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: currency
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            type: string
+        - name: measure
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            type: string
+      responses:
+        '200':
+          description: Данные версии трансфертных ставок
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/TransferRateTableView'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_TS_VIEW
+  /api/v1/stability-rates/calculation/{calculationUid}:
+    get:
+      tags:
+        - Calculation - stability rates
+      summary: Получить расчет по UID
+      description: Получить расчет по UID
+      operationId: ru.vtb.calm.subo.web.rest.stabilityrates.StabilityRatesCalculationController#findByUid(UUID)
+      parameters:
+        - name: calculationUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Расчет
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StabilityRatesCalculation'
+        '404':
+          description: Запись не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: VSSDV_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_CALC_STABILITY_RATES_GET
+  /api/v1/stability-rates/calculation-version/{calculationVersionUid}:
+    get:
+      tags:
+        - Calculation Version - stability rates
+      summary: Получить версию расчета по id
+      description: Получить версию расчета по id
+      operationId: ru.vtb.calm.subo.web.rest.stabilityrates.StabilityRatesCalculationVersionController#findCalculationVersion(UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Версии расчета
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/StabilityRatesCalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_CALCVERSION_STABILITY_RATES_GET
+  /api/v1/rrbk-cf/calculation/{calculationUid}:
+    get:
+      tags:
+        - Calculation - risk
+      summary: Получить расчет по UID
+      description: Получить расчет по UID
+      operationId: ru.vtb.calm.subo.web.rest.risk.RiskCalculationController#findByUid(UUID)
+      parameters:
+        - name: calculationUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Расчет
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskCalculation'
+        '404':
+          description: Запись не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: RRBK_CALCULATION_READ_SUPPORT
+      x-audit:
+        event: CALM_CORE_RISK_CALC_VIEW
+  /api/v1/rrbk-cf/calculation-version:
+    get:
+      tags:
+        - Calculation Version - risk
+      summary: Получить версии расчета по id расчета
+      description: Получить версии расчета по id расчета
+      operationId: ru.vtb.calm.subo.web.rest.risk.RiskCalculationVersionController#getCalculationVersions(UUID,Pageable)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: pageable
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+        - name: page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: Индекс страницы с отсчетом от нуля (0..N)
+            default: 0
+        - name: size
+          in: query
+          schema:
+            maxLength: 100
+            type: string
+            description: Размер возвращаемой страницы
+            default: '0'
+      responses:
+        '200':
+          description: Версии расчета
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/RiskCalculationVersion'
+      x-security:
+        permission: RRBK_CALCULATION_READ_SUPPORT
+      x-audit:
+        event: CALM_CORE_RISK_CALCVERSIONSLIST_VIEW
+  /api/v1/rrbk-cf/calculation-version/status:
+    get:
+      tags:
+        - Calculation Version - risk
+      summary: Получить список статусов версии расчёта
+      description: Получить список статусов версии расчёта
+      operationId: ru.vtb.calm.subo.web.rest.risk.RiskCalculationVersionController#getVersionStatus(UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/RiskVersionStatus'
+      x-security:
+        permission: RRBK_CALCULATION_READ_SUPPORT
+  /api/v1/product-scenario/rows/search:
+    get:
+      tags:
+        - Product scenario
+      summary: Поиск данных продуктового сценария
+      description: Поиск данных продуктового сценария
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioController#search(UUID,String,String,UUID,List)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: currency
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            type: string
+        - name: group
+          in: query
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+        - name: productUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: segments
+          in: query
+          required: true
+          schema:
+            maxItems: 2147483647
+            type: array
+            items:
+              maxLength: 255
+              type: string
+      responses:
+        '200':
+          description: Данные (результата интерполяции) продуктового сценария структурированны по ГБЛ (сегменты)
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/ScenarioTableViewBySegment'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_PRODUCT_VIEW
+  /api/v1/product-scenario/product-tree:
+    get:
+      tags:
+        - Product scenario
+      summary: Получение дерева продуктовых уровней с доп информацией
+      description: Получение дерева продуктовых уровней с доп информацией
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioController#getProductLevelTreeWithInfo(UUID)
+      parameters:
+        - name: productScenarioUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Дерево продуктовых уровней с доп информацией
+          content:
+            '*/*':
+              schema:
+                maxLength: 255
+                type: string
+                additionalProperties: false
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+  /api/v1/product-scenario/filter:
+    get:
+      tags:
+        - Product scenario
+      summary: Получение подготовленного фильтра для продуктового сценария по которому есть данные
+      description: Получение подготовленного фильтра для продуктового сценария по которому есть данные
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioController#getFilterData(UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Фильтр для продуктового сценария
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProductScenarioFilter'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+  /api/v1/product-scenario/download:
+    get:
+      tags:
+        - TYK
+        - Product scenario
+      summary: Скачать файл на основе версии продуктового сценария
+      description: Скачать файл на основе версии продуктового сценария
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioController#generateProductScenarioFile(UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Файл версии продуктового сценария в бинарном виде
+          content:
+            application/octet-stream:
+              schema:
+                maxLength: 255
+                type: string
+                additionalProperties: false
+        '409':
+          description: Ошибка запроса к File Maker
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_PSCENARIO_DOWNLOAD
+  /api/v1/product-scenario/characteristic/has-individual:
+    get:
+      tags:
+        - Характеристики черновика
+      summary: Есть ли индивидуальные характеристики
+      description: Есть ли индивидуальные характеристики
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioCharacteristicController#hasIndividualCharacteristic(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Есть ли индивидуальные характеристики
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProductHasIndividualCharacteristic'
+        '404':
+          description: Запись не найдена
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+  /api/v1/product-scenario/calculation/search:
+    get:
+      tags:
+        - Product scenario
+      summary: Поиск продуктового сценария по UID расчета
+      description: Поиск продуктового сценария по UID расчета
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioController#search(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Информация о результатах интерполяции
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/ProductScenario'
+        '409':
+          description: Ошибка запроса к Data Preparation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+  /api/v1/parameters:
+    get:
+      tags:
+        - Доп. параметры и НСИ
+      summary: Получить состояние доп. параметров для версии расчета
+      description: Получить состояние доп. параметров для версии расчета
+      operationId: ru.vtb.calm.subo.web.rest.parameter.AdditionalParamController#getVersionDetails(UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Состояние доп. параметров для версии расчета
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/AdditionalParamDraftDetail'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_VERSION_PARAMETERS_VIEW
+  /api/v1/macro/rows/search:
+    get:
+      tags:
+        - Macro
+      summary: Поиск данных выбранной версии макро сценария
+      description: Поиск данных выбранной версии макро сценария
+      operationId: ru.vtb.calm.subo.web.rest.MacroController#search(UUID,String,String)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: currency
+          in: query
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+        - name: measure
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            type: string
+      responses:
+        '200':
+          description: Данные версии макро
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/MacroTableView'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_MACRO_VIEW
+  /api/v1/derivatives-models/calculation/{calculationUid}:
+    get:
+      tags:
+        - Calculation - derivatives models
+      summary: Получить расчет по UID
+      description: Получить расчет по UID
+      operationId: ru.vtb.calm.subo.web.rest.derivatives.DerivativesModelsCalculationController#findByUid(UUID)
+      parameters:
+        - name: calculationUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Расчет
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DerivativesModelsCalculation'
+        '404':
+          description: Запись не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: VSSDV_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_CALC_DERIVATIVES_MODELS_GET
+  /api/v1/derivatives-models/calculation-version:
+    get:
+      tags:
+        - Calculation Version - derivatives models
+      summary: Получить список всех версий расчетов с пагинацией
+      description: Получить список всех версий расчетов с пагинацией
+      operationId: ru.vtb.calm.subo.web.rest.derivatives.DerivativesModelsCalculationVersionController#findAll(Pageable)
+      parameters:
+        - name: pageable
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+        - name: page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 0
+            type: integer
+            description: Индекс страницы с отсчетом от нуля (0..N)
+            default: 0
+        - name: size
+          in: query
+          schema:
+            maxLength: 100
+            type: string
+            description: Размер возвращаемой страницы
+            default: '0'
+      responses:
+        '200':
+          description: Список всех расчетов с пагинацией
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/CalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_CALCVERSION_DERIVATIVES_MODELS_GET_ALL
+  /api/v1/derivatives-models/calculation-version/{calculationVersionUid}:
+    get:
+      tags:
+        - Calculation Version - derivatives models
+      summary: Получить версию расчета по id
+      description: Получить версию расчета по id
+      operationId: ru.vtb.calm.subo.web.rest.derivatives.DerivativesModelsCalculationVersionController#findCalculationVersion(UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Версии расчета
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/CalculationVersion'
+      x-security:
+        permission: VSSDV_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_CALCVERSION_DERIVATIVES_MODELS_GET
+  /api/v1/cashflow/calculation/start-date/{calculationUid}:
+    get:
+      tags:
+        - Calculation - cash flow
+      summary: Получить дату факта расчета по UID
+      description: Получить дату факта расчета по UID
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationController#getStartDate(UUID)
+      parameters:
+        - name: calculationUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Дата факта
+          content:
+            application/json:
+              schema:
+                maxLength: 255
+                type: string
+                additionalProperties: false
+        '404':
+          description: Дата факта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/cashflow/calculation/filter/{calculationUid}:
+    get:
+      tags:
+        - Calculation - cash flow
+      summary: Получить расчеты с такими же начальной и конечной датами, как и у передаваемого расчета
+      description: Получить расчеты с такими же начальной и конечной датами, как и у передаваемого расчета
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationController#getCalculationsByStartAndEndDate(UUID,Pageable)
+      parameters:
+        - name: calculationUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: pageable
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+      responses:
+        '200':
+          description: Расчеты, отфильтованные по начальной и конечной датам
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/CashFlowCalculation'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/cashflow/calculation-version/{calculationVersionUid}:
+    get:
+      tags:
+        - Calculation Version - cash flow
+      summary: Получить версию расчета по id
+      description: Получить версию расчета по id
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationVersionController#findCalculationVersion(UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Версии расчета
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/CalculationVersion'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_CALCVERSION_VIEW
+  /api/v1/cashflow/calculation-version/status:
+    get:
+      tags:
+        - Calculation Version - cash flow
+      summary: Получить список статусов версии расчёта
+      description: Получить список статусов версии расчёта
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationVersionController#getVersionStatus(UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/CashFlowVersionStatus'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ_SUPPORT
+      x-audit:
+        event: CALM_CORE_CALC_VERSION_STATUSES
+  /api/v1/cashflow/calculation-version/calculation-balance-result/upload:
+    get:
+      tags:
+        - Calculation Version - cash flow
+      summary: Получение результата версии расчета от Cash Flow в виде csv файла
+      description: Получение результата версии расчета от Cash Flow в виде csv файла
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationVersionController#uploadBalanceResult(UUID)
+      parameters:
+        - name: calculationVersionUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Файл сгенерирован
+          content:
+            application/octet-stream:
+              schema:
+                maxLength: 255
+                type: string
+                additionalProperties: false
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+  /api/v1/cashflow/airflow-health-info:
+    get:
+      tags:
+        - TYK
+      operationId: ru.vtb.calm.subo.web.rest.cashflow.CashFlowCalculationHealthCheckController#getAirflowHealthInfo()
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AirflowHealthCheckResponse'
+  /api/v1/cash-flow/report/{solveId}/status:
+    get:
+      tags:
+        - Balance report
+      summary: Получения статуса заявки по solveId
+      description: Получения статуса заявки по solveId
+      operationId: ru.vtb.calm.subo.web.rest.BalanceReportController#getRequestStatus(UUID)
+      parameters:
+        - name: solveId
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Получение статуса заявки прошло успешно
+          content:
+            '*/*':
+              schema:
+                maxLength: 255
+                type: string
+                additionalProperties: false
+        '404':
+          description: Заявки для данного solveId не существует
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+  /api/v1/cash-flow/cf-product:
+    get:
+      tags:
+        - Balance cf product
+      summary: Получение всех продуктов
+      description: Получение всех продуктов
+      operationId: ru.vtb.calm.subo.web.rest.BalanceCfProductController#getCfProducts()
+      responses:
+        '200':
+          description: Получение продуктов
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/CfProduct'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+  /api/v1/calculation/drafts/transfer-rate:
+    get:
+      tags:
+        - Transfer Rate Draft
+      summary: Получить текущий черновик трансфертных ставок
+      description: Получить текущий черновик трансфертных ставок
+      operationId: ru.vtb.calm.subo.web.rest.TransferRateDraftController#getCurrentScenarioDraft(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Черновик трансфертных ставок
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRateDraft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+  /api/v1/calculation/drafts/transfer-rate/version:
+    get:
+      tags:
+        - Transfer Rate Draft
+      summary: Получение списка трансфертных ставок из черновика в разрезе расчета
+      description: Получение списка трансфертных ставок из черновика в разрезе расчета
+      operationId: ru.vtb.calm.subo.web.rest.TransferRateDraftController#getScenarioDraftVersions(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Список трансфертных ставок из черновика
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TransferRateDraft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_TSSCENARIO_LISTVIEW
+  /api/v1/calculation/drafts/transfer-rate/rows/search:
+    get:
+      tags:
+        - Transfer Rate Draft
+      summary: Поиск данных черновика трансфертных ставок
+      description: Поиск данных черновика трансфертных ставок
+      operationId: ru.vtb.calm.subo.web.rest.TransferRateDraftController#search(UUID,String,String)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: currency
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            type: string
+        - name: measure
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            type: string
+      responses:
+        '200':
+          description: Данные черновика трансфертных ставок
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/TransferRateTableView'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTTS_VIEW
+  /api/v1/calculation/drafts/transfer-rate/download:
+    get:
+      tags:
+        - TYK
+        - Transfer Rate Draft
+      summary: Скачать файл трансфертных ставок
+      description: Скачать файл трансфертных ставок
+      operationId: ru.vtb.calm.subo.web.rest.TransferRateDraftController#generateTransferRateFile(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Файл трансфертных ставок в бинарном виде
+          content:
+            application/octet-stream:
+              schema:
+                maxLength: 255
+                type: string
+                additionalProperties: false
+        '409':
+          description: Ошибка запроса к File Maker
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTTS_DOWNLOAD
+  /api/v1/calculation/drafts/product-scenario:
+    get:
+      tags:
+        - Product scenario draft
+      summary: Получить текущий черновик продуктового сценария
+      description: Получить текущий черновик продуктового сценария
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#getCurrentProductScenarioDraft(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Черновик продуктового сценария
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/Draft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_CALCDRAFT_VIEW
+  /api/v1/calculation/drafts/product-scenario/version:
+    get:
+      tags:
+        - Product scenario draft
+      summary: Получить список продуктовых сценариев в черновик в разрезе расчета
+      description: Получить список продуктовых сценариев в черновик в разрезе расчета
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#getProductScenarioListDraftVersion(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Список продуктовых сценариев в черновике
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  maxLength: 255
+                  type: string
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_PRODUCTSCENARIO_LISTVIEW
+  /api/v1/calculation/drafts/product-scenario/validate:
+    get:
+      tags:
+        - Product scenario draft
+      summary: Проверка черновика продуктового сценария
+      description: Проверка черновика продуктового сценария прошла успешно
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#validateDraft(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Проверка черновика продуктового сценария прошла успешно
+          content:
+            application/json:
+              schema:
+                type: boolean
+                additionalProperties: false
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/calculation/drafts/product-scenario/rows/search:
+    get:
+      tags:
+        - Product scenario draft
+      summary: Поиск данных черновика продуктового сценария
+      description: Поиск данных черновика продуктового сценария
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#search(ProductScenarioRowsRequest)
+      parameters:
+        - name: productScenarioRowsRequest
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProductScenarioRowsRequest'
+      responses:
+        '200':
+          description: Данные черновика продуктового сценария
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/ScenarioTableViewBySegment'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/calculation/drafts/product-scenario/product-tree:
+    get:
+      tags:
+        - Product scenario draft
+      summary: Получение дерева продуктовых уровней с доп информацией
+      description: Получение дерева продуктовых уровней с доп информацией
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#getProductLevelTreeWithInfo(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Дерево продуктовых уровней с доп информацией
+          content:
+            '*/*':
+              schema:
+                maxLength: 255
+                type: string
+                additionalProperties: false
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/calculation/drafts/product-scenario/filter:
+    get:
+      tags:
+        - Product scenario draft
+      summary: Получение подготовленного фильтра для черновика продуктового сценария по которому есть данные
+      description: Получение подготовленного фильтра для черновика продуктового сценария по которому есть данные
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#getFilterData(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Фильтр для шаблона продуктового сценария
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ProductScenarioFilter'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/calculation/drafts/product-scenario/download:
+    get:
+      tags:
+        - TYK
+        - Product scenario draft
+      summary: Скачать файл единого шаблона на основе продуктового сценария
+      description: Скачать файл единого шаблона на основе продуктового сценария
+      operationId: ru.vtb.calm.subo.web.rest.ProductScenarioDraftController#generateProductScenarioFile(UUID,ProductGenerateFileMode)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: mode
+          in: query
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+            enum:
+              - ALL
+              - NOT_WEIGHT
+              - WEIGHT
+            default: ALL
+      responses:
+        '200':
+          description: Файл единого шаблона в бинарном виде
+          content:
+            application/octet-stream:
+              schema:
+                maxLength: 255
+                type: string
+                additionalProperties: false
+        '409':
+          description: Ошибка запроса к File Maker
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTPRODUCT_DOWNLOAD
+  /api/v1/calculation/drafts/parameters/version:
+    get:
+      tags:
+        - Черновик доп. параметров и НСИ
+      summary: Получить список версий доп. параметров в разрезе расчета
+      description: Получить список версий доп. параметров в разрезе расчета
+      operationId: ru.vtb.calm.subo.web.rest.parameter.AdditionalParamDraftController#getAdditionalParamDraftVersions(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Список версий доп. параметров
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  maxLength: 255
+                  type: string
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+      x-audit:
+        event: CALM_CORE_DRAFT_PARAMETERS_LISTVIEW
+  /api/v1/calculation/drafts/parameters/nss:
+    get:
+      tags:
+        - Черновик доп. параметров и НСИ
+      summary: Список НСИ для выбранного параметра
+      description: Список НСИ для выбранного параметра
+      operationId: ru.vtb.calm.subo.web.rest.parameter.AdditionalParamDraftController#getNssRequests(Integer)
+      parameters:
+        - name: paramId
+          in: query
+          required: true
+          schema:
+            maximum: 2147483647
+            minimum: -2147483648
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Список НСИ для выбранного параметра
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestPageWrapper'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFT_NSS_LIST
+  /api/v1/calculation/drafts/macro:
+    get:
+      tags:
+        - Draft Macro
+      summary: Получить текущий черновик макро
+      description: Получить текущий черновик макро
+      operationId: ru.vtb.calm.subo.web.rest.MacroDraftController#getCurrentScenarioDraft(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Черновик макро
+          content:
+            application/json:
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/MacroDraft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+  /api/v1/calculation/drafts/macro/version:
+    get:
+      tags:
+        - Draft Macro
+      summary: Получение списка макро из черновика в разрезе расчета
+      description: Получение списка макро из черновика в разрезе расчета
+      operationId: ru.vtb.calm.subo.web.rest.MacroDraftController#findAllScenarioDrafts(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Список макро из черновика
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MacroDraft'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/calculation/drafts/macro/rows/search:
+    get:
+      tags:
+        - Draft Macro
+      summary: Поиск данных черновика макро
+      description: Поиск данных черновика макро
+      operationId: ru.vtb.calm.subo.web.rest.MacroDraftController#search(UUID,String,String)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+        - name: currency
+          in: query
+          required: false
+          schema:
+            maxLength: 255
+            type: string
+        - name: measure
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            type: string
+      responses:
+        '200':
+          description: Данные черновика макро
+          content:
+            '*/*':
+              schema:
+                maxItems: 2147483647
+                type: array
+                additionalProperties: false
+                items:
+                  $ref: '#/components/schemas/MacroTableView'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTMACRO_VIEW
+  /api/v1/calculation/drafts/macro/download:
+    get:
+      tags:
+        - TYK
+        - Draft Macro
+      summary: Скачать файл черновика макро
+      description: Скачать файл черновика макро
+      operationId: ru.vtb.calm.subo.web.rest.MacroDraftController#generateDraftMacroFile(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Файл черновика макро в бинарном виде
+          content:
+            application/octet-stream:
+              schema:
+                maxLength: 255
+                type: string
+                additionalProperties: false
+        '409':
+          description: Ошибка запроса к File Maker
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+      x-audit:
+        event: CALM_CORE_DRAFTMACRO_DOWNLOAD
+  /api/v1/calculation/drafts/check/volume:
+    get:
+      tags:
+        - Calculation Drafts
+      summary: Есть ли не 0-вые объемы для последней версии шаблонов сценария для расчета
+      description: Есть ли не 0-вые объемы для последней версии шаблонов сценария для расчета
+      operationId: ru.vtb.calm.subo.web.rest.CalculationDraftsController#checkNotZeroVolumesInScenarios(UUID)
+      parameters:
+        - name: calculationUid
+          in: query
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Флаг о том что есть ли не 0-вые объемы для последней версии шаблонов сценария для расчета
+          content:
+            '*/*':
+              schema:
+                type: boolean
+                additionalProperties: false
+      x-security:
+        permission: CASHFLOW_CALCULATION_WRITE
+  /api/v1/calculation-period/{calculationUid}:
+    get:
+      tags:
+        - Calculation Period
+      summary: Получение отчетных периодов по UID расчета
+      description: Получение отчетных периодов по id расчета
+      operationId: ru.vtb.calm.subo.web.rest.CalculationPeriodController#getByCalculationUid(UUID)
+      parameters:
+        - name: calculationUid
+          in: path
+          required: true
+          schema:
+            maxLength: 255
+            pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+            type: string
+      responses:
+        '200':
+          description: Массив отчетных периодов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationPeriod'
+        '404':
+          description: Запись не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Ошибка запроса к Data Preparation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-security:
+        permission: CASHFLOW_CALCULATION_READ
+components:
+  schemas:
+    IndividualCharacteristic:
+      required:
+        - measureGroups
+        - productFullName
+        - productUid
+        - segmentId
+        - segmentName
+      type: object
+      properties:
+        productUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        productFullName:
+          maxLength: 255
+          type: string
+        segmentId:
+          maxLength: 255
+          type: string
+        segmentName:
+          maxLength: 255
+          type: string
+        measureGroups:
+          maxItems: 2147483647
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductCharacteristicGroup'
+      additionalProperties: false
+    ProductCharacteristicGroup:
+      required:
+        - measureGroup
+        - measureNames
+      type: object
+      properties:
+        measureGroup:
+          maxLength: 255
+          type: string
+        measureNames:
+          maxItems: 2147483647
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductCharacteristicMeasureName'
+      additionalProperties: false
+    ProductCharacteristicMeasureName:
+      required:
+        - enabled
+        - measureName
+      type: object
+      properties:
+        measureName:
+          maxLength: 255
+          type: string
+        enabled:
+          type: boolean
+      additionalProperties: false
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          maxLength: 255
+          type: string
+        logMessage:
+          maxLength: 255
+          type: string
+        code:
+          maxLength: 255
+          type: string
+        service:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    GeneralCharacteristic:
+      required:
+        - measureGroups
+      type: object
+      properties:
+        measureGroups:
+          maxItems: 2147483647
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductCharacteristicGroup'
+      additionalProperties: false
+    VssdvCalculationCreateRequest:
+      required:
+        - message
+      type: object
+      properties:
+        message:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    VssdvCalculation:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        description:
+          maxLength: 255
+          type: string
+        startDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        type:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+        lastModifiedBy:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        modifiedDate:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    VssdvCalculationVersionCreateRequest:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 255
+          type: string
+        stabilityRatesCalculationVersionUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+      additionalProperties: false
+    VssdvCalculationVersion:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        type:
+          maxLength: 255
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        status:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+        calculationUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        stabilityRatesCalculationVersionUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        updateDate:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    RequestBodyPlug:
+      type: object
+      properties:
+        message:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    VssdvCorrectionRequest:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        value:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: number
+        description:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    StabilityRatesCalculationCreateRequest:
+      type: object
+      properties:
+        message:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    Calculation:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        description:
+          maxLength: 255
+          type: string
+        startDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        type:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+        lastModifiedBy:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        modifiedDate:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    StabilityRatesCalculationVersionCreateRequest:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 255
+          type: string
+        balanceDate:
+          maxLength: 255
+          type: string
+        applicationPeriod:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    CalculationVersion:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        type:
+          maxLength: 255
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        status:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    StabilityRatesCalculationVersion:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        type:
+          maxLength: 255
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        status:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+        calculationUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        balanceDate:
+          maxLength: 255
+          type: string
+        effectiveDate:
+          maxLength: 255
+          type: string
+        applicationPeriod:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    StabilityRatesRecalculationRequest:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        value:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: number
+      additionalProperties: false
+    RiskCalculationCreateRequest:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 255
+          minLength: 5
+          type: string
+        description:
+          maxLength: 255
+          type: string
+        sliceDate:
+          maxLength: 255
+          type: string
+        sliceId:
+          maxLength: 255
+          type: string
+        scenarios:
+          maxItems: 2147483647
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskScenario'
+        store:
+          maxLength: 255
+          type: string
+        stateId:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+      additionalProperties: false
+    RiskScenario:
+      type: object
+      properties:
+        scenarioId:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        scenarioName:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    RiskCalculation:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        description:
+          maxLength: 255
+          type: string
+        startDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        type:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+        lastModifiedBy:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        modifiedDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        sliceDate:
+          maxLength: 255
+          type: string
+        status:
+          maxLength: 255
+          type: string
+        warning:
+          type: boolean
+      additionalProperties: false
+    ResponseError:
+      type: object
+      properties:
+        code:
+          maxLength: 255
+          type: string
+        descr:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    SrrbkAirflowResponse:
+      required:
+        - solve_id
+      type: object
+      properties:
+        status:
+          maxLength: 255
+          type: string
+        descr:
+          maxLength: 255
+          type: string
+        errors:
+          maxItems: 2147483647
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseError'
+        solve_id:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        agg_report_table_name:
+          maxLength: 255
+          type: string
+        detail_report_table_name:
+          maxLength: 255
+          type: string
+        calculation_parameters_tables:
+          $ref: '#/components/schemas/SrrbkCalculationParametersTables'
+      additionalProperties: false
+    SrrbkCalculationParametersTables:
+      type: object
+      properties:
+        macro:
+          type: object
+          additionalProperties: false
+        ts:
+          type: object
+          additionalProperties: false
+      additionalProperties: false
+    RiskCalculationVersion:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        type:
+          maxLength: 255
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        status:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    DerivativesModelsCalculationCreateRequest:
+      type: object
+      properties:
+        message:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    DerivativesModelsCalculationVersion:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        type:
+          maxLength: 255
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        status:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+        currency:
+          maxLength: 255
+          type: string
+        basisId:
+          maxLength: 255
+          type: string
+        productId:
+          maxLength: 255
+          type: string
+        toolId:
+          maxLength: 255
+          type: string
+        calculationUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        modelId:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+      additionalProperties: false
+    DerivativesModelsCalculationVersionCreateRequest:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 255
+          type: string
+        values:
+          maxItems: 2147483647
+          type: array
+          items:
+            $ref: '#/components/schemas/DerivativesModelsCalculationVersionCreateValue'
+      additionalProperties: false
+    DerivativesModelsCalculationVersionCreateValue:
+      required:
+        - curveId
+        - group
+        - productToolCrossId
+      type: object
+      properties:
+        curveId:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        productToolCrossId:
+          maxLength: 255
+          type: string
+        group:
+          maxLength: 255
+          type: string
+          enum:
+            - ALM
+            - HADOOP
+        toolId:
+          maxLength: 255
+          type: string
+          enum:
+            - SPROPT_ADDWD
+            - SPRFL_ADDWD
+            - SPRFL_ADD
+            - SPROPT_MCAP
+            - SPROPT_AVANS
+            - SPROPT_RAST
+            - SPROPT_WD
+            - IAM_ET
+            - SPROPT_WD_MCAP
+            - PERIODIC_ET
+            - SPROPT_NSO
+            - NSO
+            - TOPUP
+            - ADVANCE
+            - PERIODIC
+            - PROGRNEW
+      additionalProperties: false
+    VssdvAirflowResponse:
+      type: object
+      properties:
+        status:
+          maxLength: 255
+          type: string
+        descr:
+          maxLength: 255
+          type: string
+        errors:
+          maxItems: 2147483647
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseError'
+        tables:
+          maxItems: 2147483647
+          type: array
+          items:
+            $ref: '#/components/schemas/VssdvTableName'
+        solve_id:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+      additionalProperties: false
+    VssdvTableName:
+      type: object
+      properties:
+        agg_report_table_name:
+          maxLength: 255
+          type: string
+        target_report_table_name:
+          maxLength: 255
+          type: string
+        name:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    AirflowHealthCheckResponse:
+      type: object
+      properties:
+        dag_alive_states:
+          type: object
+          additionalProperties: false
+        products_actual_dttm:
+          type: object
+          additionalProperties: false
+      additionalProperties: false
+    CalculationPeriodRequest:
+      required:
+        - calculationPeriods
+      type: object
+      properties:
+        factDate:
+          maxLength: 255
+          type: string
+        calculationPeriodStep:
+          maxLength: 255
+          type: string
+        calculationPeriods:
+          maxItems: 2147483647
+          type: array
+          items:
+            $ref: '#/components/schemas/CalculationPeriodUi'
+      additionalProperties: false
+    CalculationPeriodUi:
+      type: object
+      properties:
+        serialNumber:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        mark:
+          maxLength: 255
+          type: string
+        startDate:
+          maxLength: 255
+          type: string
+        endDate:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    CashFlowCalculationCreateRequest:
+      required:
+        - name
+        - periods
+      type: object
+      properties:
+        name:
+          maxLength: 255
+          minLength: 5
+          type: string
+        description:
+          maxLength: 255
+          type: string
+        periods:
+          $ref: '#/components/schemas/CalculationPeriodRequest'
+      additionalProperties: false
+    AirflowResponse:
+      type: object
+      properties:
+        status:
+          maxLength: 255
+          type: string
+        descr:
+          maxLength: 255
+          type: string
+        errors:
+          maxItems: 2147483647
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseError'
+        solve_id:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        agg_report_table_name:
+          maxLength: 255
+          type: string
+        source_tables:
+          $ref: '#/components/schemas/CalculationParametersTables'
+      additionalProperties: false
+    CalculationParametersTables:
+      type: object
+      properties:
+        macro:
+          $ref: '#/components/schemas/MacroParameters'
+        ts:
+          $ref: '#/components/schemas/TransferRateParameters'
+        products:
+          $ref: '#/components/schemas/ProductScenarioParameters'
+        manual_deals:
+          type: object
+          additionalProperties: false
+      additionalProperties: false
+    MacroParameters:
+      type: object
+      properties:
+        fxrate:
+          maxLength: 255
+          type: string
+        market_index:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    ProductScenarioParameters:
+      type: object
+      properties:
+        volume_forecast:
+          maxLength: 255
+          type: string
+        issues_weight:
+          maxLength: 255
+          type: string
+        issues_weight_distribution:
+          maxLength: 255
+          type: string
+        interest_margin_rates:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    TransferRateParameters:
+      type: object
+      properties:
+        ftp:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    Document:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        fileName:
+          maxLength: 255
+          type: string
+        created:
+          maxLength: 255
+          type: string
+          format: date-time
+        scenarioType:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    TransferRateDraft:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        calculationUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        name:
+          maxLength: 255
+          type: string
+        version:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        status:
+          maxLength: 255
+          type: string
+        fileName:
+          maxLength: 255
+          type: string
+        fixationType:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        modifiedDate:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    Draft:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        calculationUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        name:
+          maxLength: 255
+          type: string
+        version:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        status:
+          maxLength: 255
+          type: string
+        fixationType:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        modifiedDate:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    AdditionalParamDraft:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        calculationUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        name:
+          maxLength: 255
+          type: string
+        version:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        status:
+          maxLength: 255
+          type: string
+        fixationType:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        modifiedDate:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    MacroDraft:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        name:
+          maxLength: 255
+          type: string
+        calculationUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        version:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        status:
+          maxLength: 255
+          type: string
+        fixationType:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        modifiedDate:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    VssdvUpdateCalculationNameRequest:
+      required:
+        - calculationVersionUid
+        - name
+      type: object
+      properties:
+        calculationVersionUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        name:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    CalculationUpdateRequest:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 255
+          minLength: 5
+          type: string
+        description:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    AdditionalParamUpdateRequest:
+      required:
+        - draftParamId
+        - paramValue
+      type: object
+      properties:
+        draftParamId:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: integer
+          format: int64
+        nssFileUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        paramValue:
+          type: boolean
+      additionalProperties: false
+    AdditionalParamDraftDetail:
+      type: object
+      properties:
+        draftParamId:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: integer
+          format: int64
+        paramId:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        paramValue:
+          type: boolean
+        paramName:
+          maxLength: 255
+          type: string
+        nssRequirement:
+          maxLength: 255
+          type: string
+          enum:
+            - FORBIDDEN
+            - OPTIONAL
+            - REQUIRED
+        nssFileUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        nssFileName:
+          maxLength: 255
+          type: string
+        nssDescription:
+          maxLength: 255
+          type: string
+        nssUploadDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        nssUploadedBy:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    Pageable:
+      type: object
+      properties:
+        pageNumber:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        pageSize:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+        sort:
+          $ref: '#/components/schemas/Sort'
+        offset:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: integer
+          format: int64
+      additionalProperties: false
+    Sort:
+      type: object
+      properties:
+        unsorted:
+          type: boolean
+        sorted:
+          type: boolean
+        empty:
+          type: boolean
+      additionalProperties: false
+    TransferRateTableValues:
+      type: object
+      properties:
+        date:
+          maxLength: 255
+          type: string
+          description: Дата
+        value:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: number
+          description: Значения объема
+      additionalProperties: false
+      description: Значения объемов на даты для отображения в таблице ТС
+    TransferRateTableView:
+      type: object
+      properties:
+        measure:
+          maxLength: 255
+          type: string
+          description: Наименование измерения ТС
+        param:
+          maxLength: 255
+          type: string
+          description: Наименование параметра ТС
+        currency:
+          maxLength: 255
+          type: string
+          description: Валюта
+          example: RUB
+        term:
+          maxLength: 255
+          type: string
+          description: Срочность
+          example: 1M
+        values:
+          maxItems: 2147483647
+          type: array
+          description: Значения объемов на даты
+          items:
+            $ref: '#/components/schemas/TransferRateTableValues'
+      additionalProperties: false
+      description: Вид отображения данных для таблицы трансфертных ставок
+    StabilityRatesCalculation:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        description:
+          maxLength: 255
+          type: string
+        startDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        type:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+        lastModifiedBy:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        modifiedDate:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    RiskVersionStatus:
+      type: object
+      properties:
+        status:
+          maxLength: 255
+          type: string
+        step:
+          maxLength: 255
+          type: string
+        nextStep:
+          maxLength: 255
+          type: string
+        date:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    ScenarioTableValues:
+      type: object
+      properties:
+        date:
+          maxLength: 255
+          type: string
+          description: Дата
+        value:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: number
+          description: Значения объема
+      additionalProperties: false
+      description: Значения объемов на даты для отображения в таблице продуктового сценария
+    ScenarioTableView:
+      type: object
+      properties:
+        finIndicator:
+          maxLength: 255
+          type: string
+        productUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+          description: Код продукта
+        currency:
+          maxLength: 255
+          type: string
+          description: Валюта
+          example: RUB
+        term:
+          maxLength: 255
+          type: string
+          description: Срочность
+          example: 1M
+        rateType:
+          maxLength: 255
+          type: string
+          description: Тип ставки
+          example: Фиксированная ставка
+        measureUnit:
+          maxLength: 255
+          type: string
+          description: Ед. измерения (проценты, доли и т.д.)
+        values:
+          maxItems: 2147483647
+          type: array
+          description: Значения объемов на даты
+          items:
+            $ref: '#/components/schemas/ScenarioTableValues'
+      additionalProperties: false
+      description: Вид отображения данных для таблицы продуктового сценария
+    ScenarioTableViewBySegment:
+      type: object
+      properties:
+        segment:
+          maxLength: 255
+          type: string
+          description: Сегмент(ГБЛ)
+          example: РБ
+        fullTableViews:
+          maxItems: 2147483647
+          type: array
+          description: Массив данных для отображения в таблице, отсносящийся к сегменту
+          items:
+            $ref: '#/components/schemas/ScenarioTableView'
+      additionalProperties: false
+      description: Обёртка данных для таблицы продуктового сценария, для разделения на сегменты
+    ProductScenarioFilter:
+      type: object
+      properties:
+        currency:
+          maxLength: 255
+          type: string
+          description: Валюта
+          example: RUB
+        segments:
+          maxLength: 255
+          type: string
+          description: Сегмент (ГБЛ)
+          example: РБ, СМБ
+        level:
+          maxLength: 255
+          type: string
+          description: Уровень продукта
+          example: Кредиты ЮЛ/Кредиты
+        productUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+          description: Идентификатор продукта
+          example: 46c98777-8fe7-4ba4-a78a-2cd28c124d0b
+        group:
+          maxLength: 255
+          type: string
+          description: Группа
+          example: Группа
+      additionalProperties: false
+      description: Фильтр связанный с продуктовым сценарием, необходим для выдачи фильтров по умолчаниюпо которым точно будут отображены данные
+    ProductHasIndividualCharacteristic:
+      required:
+        - hasIndividual
+      type: object
+      properties:
+        hasIndividual:
+          type: boolean
+      additionalProperties: false
+    ProductScenario:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        calculationUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        version:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        created:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    MacroTableValues:
+      type: object
+      properties:
+        date:
+          maxLength: 255
+          type: string
+          description: Дата
+        value:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: number
+          description: Значения объема
+      additionalProperties: false
+      description: Значения объемов на даты для отображения в таблице Макро
+    MacroTableView:
+      type: object
+      properties:
+        measure:
+          maxLength: 255
+          type: string
+          description: Наименование измерения макро
+        param:
+          maxLength: 255
+          type: string
+          description: Наименование параметра макро
+        currency:
+          maxLength: 255
+          type: string
+          description: Валюта
+          example: RUB
+        values:
+          maxItems: 2147483647
+          type: array
+          description: Значения объемов на даты
+          items:
+            $ref: '#/components/schemas/MacroTableValues'
+      additionalProperties: false
+      description: Вид отображения данных для таблицы макро
+    DerivativesModelsCalculation:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        description:
+          maxLength: 255
+          type: string
+        startDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        type:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+        lastModifiedBy:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        modifiedDate:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    CalculationVersionStatus:
+      type: object
+      properties:
+        lastStatus:
+          maxLength: 255
+          type: string
+        lastDate:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    CashFlowCalculation:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        number:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        name:
+          maxLength: 255
+          type: string
+        description:
+          maxLength: 255
+          type: string
+        startDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        type:
+          maxLength: 255
+          type: string
+        createdBy:
+          maxLength: 255
+          type: string
+        lastModifiedBy:
+          maxLength: 255
+          type: string
+        createdDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        modifiedDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        balanceSheetForecastingHorizon:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        calculationVersionStatus:
+          $ref: '#/components/schemas/CalculationVersionStatus'
+        versionCount:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        endDate:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    CashFlowVersionStatus:
+      type: object
+      properties:
+        status:
+          maxLength: 255
+          type: string
+        step:
+          maxLength: 255
+          type: string
+        nextStep:
+          maxLength: 255
+          type: string
+        date:
+          maxLength: 255
+          type: string
+          format: date-time
+      additionalProperties: false
+    BalanceReport:
+      type: object
+      properties:
+        id:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: integer
+          format: int64
+        orderBy:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: integer
+          format: int64
+        solveId:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        accountCd:
+          maxLength: 255
+          type: string
+        level1Uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        level2Uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        level3Uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        level4Uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        level5Uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        level6Uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        level7Uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        level8Uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        level9Uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        level10Uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        currencyId:
+          maxLength: 255
+          type: string
+        rateTypeCd:
+          maxLength: 255
+          type: string
+        segment:
+          maxLength: 255
+          type: string
+        dealType:
+          maxLength: 255
+          type: string
+        endDate:
+          maxLength: 255
+          type: string
+        outBalanceAmt:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: number
+        outBalanceRubAmt:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: number
+      additionalProperties: false
+    CfProduct:
+      type: object
+      properties:
+        id:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        orderBy:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: integer
+          format: int64
+        bsSide:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        parentId:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        productName:
+          maxLength: 255
+          type: string
+        cfCode:
+          maxLength: 255
+          type: string
+        cfProductCode:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    ProductScenarioRowsRequest:
+      required:
+        - calculationUid
+        - currency
+        - productUid
+        - segments
+      type: object
+      properties:
+        calculationUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        currency:
+          maxLength: 255
+          type: string
+        group:
+          maxLength: 255
+          type: string
+        productUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        segments:
+          maxItems: 2147483647
+          type: array
+          items:
+            maxLength: 255
+            type: string
+      additionalProperties: false
+    Request:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        name:
+          maxLength: 255
+          type: string
+        sourceType:
+          maxLength: 255
+          type: string
+        fileTypeId:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: integer
+          format: int64
+        description:
+          maxLength: 255
+          type: string
+        uploadDate:
+          maxLength: 255
+          type: string
+          format: date-time
+        createdBy:
+          maxLength: 255
+          type: string
+        state:
+          maxLength: 255
+          type: string
+        comment:
+          maxLength: 255
+          type: string
+        dappTablePath:
+          maxLength: 255
+          type: string
+        dappRequestUidColumnName:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+    RequestPageWrapper:
+      type: object
+      properties:
+        content:
+          maxItems: 2147483647
+          type: array
+          items:
+            $ref: '#/components/schemas/Request'
+        page:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: integer
+          format: int64
+        pageSize:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: integer
+          format: int64
+        totalElements:
+          maximum: 9223372036854776000
+          minimum: -9223372036854776000
+          type: integer
+          format: int64
+      additionalProperties: false
+    CalculationPeriod:
+      type: object
+      properties:
+        uid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        calculationUid:
+          maxLength: 255
+          pattern: \b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b
+          type: string
+        serialNumber:
+          maximum: 2147483647
+          minimum: -2147483648
+          type: integer
+          format: int32
+        mark:
+          maxLength: 255
+          type: string
+        startDate:
+          maxLength: 255
+          type: string
+        endDate:
+          maxLength: 255
+          type: string
+      additionalProperties: false
+  parameters: {}
+  securitySchemes:
+    EpaAuth:
+      type: http
+      description: Авторизация ЕПА
+      scheme: bearer
+      bearerFormat: JWT
