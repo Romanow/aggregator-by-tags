@@ -14,12 +14,6 @@ idea {
 }
 
 ext {
-    springBootVersion = "3.1.1"
-    springShellVersion = "2.1.8"
-    testCntainerVersion = "1.16.0"
-}
-
-ext {
     openApiVersion = "2.1.0"
 }
 
@@ -29,16 +23,8 @@ repositories {
     mavenCentral()
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
-        mavenBom "org.springframework.shell:spring-shell-dependencies:$springShellVersion"
-    }
-}
-
 dependencies {
-    implementation "org.springframework.boot:spring-boot-starter"
-    implementation "org.springframework.shell:spring-shell-starter"
+    implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-logging"
 
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-api:$openApiVersion"
