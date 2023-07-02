@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
+import io.swagger.v3.oas.models.Paths
 import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.media.ArraySchema
@@ -26,10 +27,7 @@ import java.util.*
 
 @RestController
 @RequestMapping("/api/v1/openapi")
-class OpenApiController(
-    private val applicationProperties: ApplicationProperties,
-    private val apis: Map<String, OpenAPI>
-) {
+class OpenApiController(private val applicationProperties: ApplicationProperties) {
     private val logger = LoggerFactory.getLogger(OpenApiController::class.java)
 
     @GetMapping(produces = [MediaType.TEXT_PLAIN_VALUE])
@@ -49,6 +47,12 @@ class OpenApiController(
     ): String {
         val openApi = OpenAPI()
 
+        val reader = Yaml.mapper().reader()
+        val apis = mutableMapOf<String, OpenAPI>()
+        for (api in applicationProperties.apis) {
+            apis[api.name] = reader.readValue(api.file.inputStream, OpenAPI::class.java)
+        }
+
         val tags: Set<Tag> = apis
             .values
             .flatMap { it.tags }
@@ -65,7 +69,8 @@ class OpenApiController(
         openApi.servers = servers()
         openApi.security = security()
 
-        openApi.components(Components())
+        openApi.paths = Paths()
+        openApi.components = Components()
         for ((name, api) in apis.entries) {
             val (_, prefix, _) = applicationProperties.apis.first { it.name == name }
             copyOpenApi(openApi, prefix, api, tags)
@@ -74,43 +79,44 @@ class OpenApiController(
         return Yaml.pretty().writeValueAsString(openApi)
     }
 
-    private fun copyOpenApi(openApi: OpenAPI, prefix: String?, api: OpenAPI, tags: Set<Tag>) {
-        val components = api.components
+    private fun copyOpenApi(dest: OpenAPI, prefix: String?, source: OpenAPI, tags: Set<Tag>) {
+        val components = source.components
 
         // Tags
-        copyTags(openApi, api, tags)
+        copyTags(source, dest, tags)
 
         // Paths
-        val usedSchemas = copyPaths(openApi, prefix, api, tags)
+        val usedSchemas = copyPaths(source, dest, prefix, tags)
 
         // Headers
-        copyHeaders(openApi, components)
+        copyHeaders(dest, components)
 
         // Parameters
-        copyParameters(openApi, components)
+        copyParameters(dest, components)
 
         // Request Body
-        copyRequestBodies(openApi, components)
+        copyRequestBodies(dest, components)
 
         // Response
-        copyResponses(openApi, components)
+        copyResponses(dest, components)
 
         // Schema
-        copySchemas(openApi, components, usedSchemas)
+        copySchemas(dest, components, usedSchemas)
 
         // Security Schemes
-        copySecuritySchemas(openApi, components)
+        copySecuritySchemas(dest, components)
     }
 
-    private fun copyTags(openApi: OpenAPI, api: OpenAPI, tags: Set<Tag>) {
-        api.tags.toSet()
-            .filter { it in tags }
-            .forEach { openApi.addTagsItem(it) }
+    private fun copyTags(source: OpenAPI, dest: OpenAPI, tags: Set<Tag>) {
+        source.tags.toSet()
+            .filter { it in tags && (dest.tags == null || it !in dest.tags) }
+            .forEach { dest.addTagsItem(it) }
     }
 
-    private fun copyPaths(openApi: OpenAPI, prefix: String?, api: OpenAPI, tags: Set<Tag>): Set<String> {
+    private fun copyPaths(source: OpenAPI, dest: OpenAPI, prefix: String?, tags: Set<Tag>): Set<String> {
         val schemas: HashSet<String> = HashSet()
-        api.paths?.forEach { (name, path) ->
+
+        source.paths?.forEach { (name, path) ->
             for ((method, operation) in path.readOperationsMap()) {
                 if (tags.map { it.name }.containsAll(operation.tags)) {
                     operation.requestBody
@@ -122,7 +128,7 @@ class OpenApiController(
                         ?.values
                         ?.filter { it.content != null }
                         ?.flatMap { it.content.values }
-                        ?.forEach { schemas += it.schema.name }
+                        ?.forEach { schemas += schemaName(it.schema) }
 
                     modifyOperation(operation)
                 } else {
@@ -131,7 +137,9 @@ class OpenApiController(
                 }
             }
 
-            openApi.path(prefix + name, path)
+            if (path.readOperations().any { it != null }) {
+                dest.path(prefix + name, path)
+            }
         }
         return schemas
     }
@@ -178,7 +186,7 @@ class OpenApiController(
 
     private fun copySchemas(openApi: OpenAPI, components: Components, schemas: Set<String>) {
         components.schemas
-            ?.filter { it.value.name in schemas }
+            ?.filter { it.key in schemas }
             ?.forEach { (name, schema) ->
                 schema.additionalProperties = false
                 openApi.components.addSchemas(name, schema)

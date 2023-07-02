@@ -1,0 +1,210 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI aggregator by Tags
+  description: Concatenate multiple OpenAPI in one file with Include and exclude tags
+  contact:
+    name: Romanov Alexey
+    url: https://romanow.github.io/
+    email: romanowalex@mail.ru
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+security: []
+tags:
+  - name: Store API
+  - name: Read
+  - name: Order API
+paths:
+  /store/api/v1/store/{orderUid}:
+    get:
+      tags:
+        - Store API
+        - Read
+      summary: User order info
+      operationId: orders
+      parameters:
+        - name: orderUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User order info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOrderResponse'
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "422":
+          description: External request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /store/api/v1/store/orders:
+    get:
+      tags:
+        - Store API
+        - Read
+      summary: List user orders
+      operationId: orders_1
+      responses:
+        "200":
+          description: User orders info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOrdersResponse'
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "422":
+          description: External request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /orders/api/v1/orders/{userId}:
+    get:
+      tags:
+        - Order API
+        - Read
+      summary: User orders info
+      operationId: userOrders
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Orders info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersInfoResponse'
+  /orders/api/v1/orders/{userId}/{orderUid}:
+    get:
+      tags:
+        - Order API
+        - Read
+      summary: User order info
+      operationId: userOrder
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: orderUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Order info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderInfoResponse'
+        "404":
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      additionalProperties: false
+    UserOrderResponse:
+      required:
+        - date
+        - orderUid
+      type: object
+      properties:
+        orderUid:
+          type: string
+          format: uuid
+        date:
+          type: string
+        model:
+          type: string
+        size:
+          type: string
+          enum:
+            - S
+            - M
+            - L
+            - XL
+        warrantyDate:
+          type: string
+        warrantyStatus:
+          type: string
+          enum:
+            - ON_WARRANTY
+            - USE_WARRANTY
+            - REMOVED_FROM_WARRANTY
+      additionalProperties: false
+    UserOrdersResponse:
+      type: array
+      properties:
+        list:
+          type: array
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/UserOrderResponse'
+        empty:
+          type: boolean
+      additionalProperties: false
+      items:
+        $ref: '#/components/schemas/UserOrderResponse'
+    OrderInfoResponse:
+      required:
+        - itemUid
+        - orderDate
+        - orderUid
+        - status
+      type: object
+      properties:
+        orderUid:
+          type: string
+          format: uuid
+        orderDate:
+          type: string
+        itemUid:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - PAID
+            - CANCELED
+            - WAITING
+      additionalProperties: false
+    OrdersInfoResponse:
+      type: array
+      properties:
+        empty:
+          type: boolean
+      additionalProperties: false
+      items:
+        $ref: '#/components/schemas/OrderInfoResponse'

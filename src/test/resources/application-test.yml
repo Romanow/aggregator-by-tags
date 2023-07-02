@@ -1,4 +1,0 @@
-application:
-  apis:
-    - name: servers
-      file: openapi/servers.yml

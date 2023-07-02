@@ -7,9 +7,9 @@ application:
     - name: store
       file: openapi/store.yml
       prefix: /store
-    - name: order
-      file: openapi/order.yml
-      prefix: /order
+    - name: orders
+      file: openapi/orders.yml
+      prefix: /orders
     - name: warehouse
       file: openapi/warehouse.yml
       prefix: /warehouse
