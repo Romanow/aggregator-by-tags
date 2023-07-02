@@ -74,7 +74,7 @@ class OpenApiController(
         return Yaml.pretty().writeValueAsString(openApi)
     }
 
-    private fun copyOpenApi(openApi: OpenAPI, prefix: String, api: OpenAPI, tags: Set<Tag>) {
+    private fun copyOpenApi(openApi: OpenAPI, prefix: String?, api: OpenAPI, tags: Set<Tag>) {
         val components = api.components
 
         // Tags
@@ -108,7 +108,7 @@ class OpenApiController(
             .forEach { openApi.addTagsItem(it) }
     }
 
-    private fun copyPaths(openApi: OpenAPI, prefix: String, api: OpenAPI, tags: Set<Tag>): Set<String> {
+    private fun copyPaths(openApi: OpenAPI, prefix: String?, api: OpenAPI, tags: Set<Tag>): Set<String> {
         val schemas: HashSet<String> = HashSet()
         api.paths?.forEach { (name, path) ->
             for ((method, operation) in path.readOperationsMap()) {
@@ -131,7 +131,7 @@ class OpenApiController(
                 }
             }
 
-            openApi.path("/$prefix$name", path)
+            openApi.path(prefix + name, path)
         }
         return schemas
     }
@@ -228,7 +228,7 @@ class OpenApiController(
         }
     }
 
-    private fun servers() = listOf(Server().url("http://localhost:8080"))
+    private fun servers() = listOf(Server().url("http://localhost:8080").description("Local server"))
 
     private fun security() = listOf<SecurityRequirement>()
 

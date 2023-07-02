@@ -1,0 +1,208 @@
+openapi: 3.0.1
+info:
+  title: Servers application
+  contact:
+    name: Romanov Alexey
+    url: https://romanow.github.io/
+    email: romanowalex@mail.ru
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+tags:
+  - name: Warehouse API
+  - name: Read
+  - name: Modification
+paths:
+  /api/v1/warehouse:
+    post:
+      tags:
+        - Warehouse API
+        - Modification
+      summary: Take item from warehouse
+      operationId: takeItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderItemRequest'
+        required: true
+      responses:
+        '200':
+          description: Item add to order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderItemResponse'
+        '400':
+          description: Bad request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Requested item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Item not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/warehouse/{orderItemUid}/warranty:
+    post:
+      tags:
+        - Warehouse API
+        - Modification
+      summary: Request item warranty
+      operationId: warranty
+      parameters:
+        - name: orderItemUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderWarrantyRequest'
+        required: true
+      responses:
+        '200':
+          description: Warranty decision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderWarrantyResponse'
+        '400':
+          description: Bad request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Requested item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: External request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/warehouse/{orderItemUid}:
+    get:
+      tags:
+        - Warehouse API
+        - Read
+      summary: Get item information
+      operationId: item
+      parameters:
+        - name: orderItemUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Item information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemInfoResponse'
+        '404':
+          description: Item info not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Warehouse API
+        - Modification
+      summary: Return item
+      operationId: returnItem
+      parameters:
+        - name: orderItemUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Item returned
+components:
+  schemas:
+    OrderItemRequest:
+      required:
+        - model
+        - orderUid
+        - size
+      type: object
+      properties:
+        orderUid:
+          type: string
+          format: uuid
+        model:
+          type: string
+        size:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    OrderItemResponse:
+      required:
+        - model
+        - orderItemUid
+        - orderUid
+        - size
+      type: object
+      properties:
+        orderItemUid:
+          type: string
+          format: uuid
+        orderUid:
+          type: string
+          format: uuid
+        model:
+          type: string
+        size:
+          type: string
+    OrderWarrantyRequest:
+      required:
+        - reason
+      type: object
+      properties:
+        reason:
+          type: string
+    OrderWarrantyResponse:
+      required:
+        - decision
+        - warrantyDate
+      type: object
+      properties:
+        warrantyDate:
+          type: string
+        decision:
+          type: string
+    ItemInfoResponse:
+      required:
+        - model
+        - size
+      type: object
+      properties:
+        model:
+          type: string
+        size:
+          type: string

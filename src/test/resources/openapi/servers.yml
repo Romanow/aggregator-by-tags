@@ -1,0 +1,233 @@
+openapi: 3.0.1
+info:
+  title: Servers application
+  contact:
+    name: Romanov Alexey
+    url: https://romanow.github.io/
+    email: romanowalex@mail.ru
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+tags:
+  - name: Server API
+  - name: Read
+  - name: Modification
+paths:
+  /api/v1/servers/{id}:
+    get:
+      tags:
+        - Server API
+        - Read
+      summary: Get server by Id
+      operationId: getById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ServerResponse'
+    put:
+      tags:
+        - Server API
+        - Modification
+      summary: Full update server by Id
+      operationId: fullUpdate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServerRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CreateServerRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ServerResponse'
+    delete:
+      tags:
+        - Server API
+        - Modification
+      summary: Delete server by Id
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+    patch:
+      tags:
+        - Server API
+        - Modification
+      summary: Edit server by Id
+      operationId: partialUpdate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServerRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CreateServerRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ServerResponse'
+  /api/v1/servers:
+    get:
+      tags:
+        - Server API
+        - Read
+      summary: Find servers in city
+      operationId: all_1
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServersResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ServersResponse'
+    post:
+      tags:
+        - Server API
+        - Modification
+      summary: Save new server
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateServerRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CreateServerRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+components:
+  schemas:
+    CreateServerRequest:
+      required:
+        - bandwidth
+        - latency
+        - purpose
+        - state
+      type: object
+      properties:
+        purpose:
+          type: string
+        latency:
+          maximum: 100
+          minimum: 0
+          type: integer
+          format: int32
+        bandwidth:
+          maximum: 10000000
+          minimum: 0
+          type: integer
+          format: int32
+        state:
+          $ref: '#/components/schemas/StateInfo'
+    StateInfo:
+      required:
+        - city
+        - country
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        city:
+          type: string
+        country:
+          type: string
+    ServerResponse:
+      required:
+        - bandwidth
+        - id
+        - latency
+        - purpose
+        - state
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        purpose:
+          type: string
+          enum:
+            - FRONTEND
+            - BACKEND
+            - DATABASE
+        latency:
+          type: integer
+          format: int32
+        bandwidth:
+          type: integer
+          format: int32
+        state:
+          $ref: '#/components/schemas/StateInfo'
+    ServersResponse:
+      required:
+        - servers
+      type: object
+      properties:
+        servers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServerResponse'

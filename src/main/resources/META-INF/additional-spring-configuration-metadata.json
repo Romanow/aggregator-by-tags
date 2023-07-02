@@ -3,7 +3,7 @@
     {
       "name": "services",
       "type": "ru.romanow.openapi.tags.config.properties.ApplicationProperties",
-      "sourceType": "ru.romanow.openapi.tags.config.properties.ApplicationProperties`"
+      "sourceType": "ru.romanow.openapi.tags.config.properties.ApplicationProperties"
     }
   ],
   "properties": [

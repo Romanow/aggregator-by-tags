@@ -1,0 +1,272 @@
+openapi: 3.0.1
+info:
+  title: Servers application
+  contact:
+    name: Romanov Alexey
+    url: https://romanow.github.io/
+    email: romanowalex@mail.ru
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+tags:
+  - name: Store API
+  - name: Read
+  - name: Modification
+paths:
+  /api/v1/store/{orderUid}/warranty:
+    post:
+      tags:
+        - Store API
+        - Modification
+      summary: Request warranty
+      operationId: warranty
+      parameters:
+        - name: orderUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WarrantyRequest'
+        required: true
+      responses:
+        '200':
+          description: Warranty decision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WarrantyResponse'
+        '400':
+          description: Bad request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: External request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/store/purchase:
+    post:
+      tags:
+        - Store API
+        - Modification
+      summary: Purchase item
+      operationId: purchase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseRequest'
+        required: true
+      responses:
+        '201':
+          description: Item purchased
+        '400':
+          description: Bad request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Item not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: External request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/store/{orderUid}:
+    get:
+      tags:
+        - Store API
+        - Read
+      summary: User order info
+      operationId: orders
+      parameters:
+        - name: orderUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User order info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOrderResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: External request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/store/orders:
+    get:
+      tags:
+        - Store API
+        - Read
+      summary: List user orders
+      operationId: orders_1
+      responses:
+        '200':
+          description: User orders info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOrdersResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: External request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/store/{orderUid}/refund:
+    delete:
+      tags:
+        - Store API
+        - Modification
+      summary: Return items
+      operationId: refund
+      parameters:
+        - name: orderUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Item returned
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: External request failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    WarrantyRequest:
+      required:
+        - reason
+      type: object
+      properties:
+        reason:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    WarrantyResponse:
+      required:
+        - decision
+        - orderUid
+        - warrantyDate
+      type: object
+      properties:
+        orderUid:
+          type: string
+          format: uuid
+        warrantyDate:
+          type: string
+        decision:
+          type: string
+    PurchaseRequest:
+      required:
+        - model
+        - size
+      type: object
+      properties:
+        model:
+          type: string
+        size:
+          type: string
+          enum:
+            - S
+            - M
+            - L
+            - XL
+    UserOrderResponse:
+      required:
+        - date
+        - orderUid
+      type: object
+      properties:
+        orderUid:
+          type: string
+          format: uuid
+        date:
+          type: string
+        model:
+          type: string
+        size:
+          type: string
+          enum:
+            - S
+            - M
+            - L
+            - XL
+        warrantyDate:
+          type: string
+        warrantyStatus:
+          type: string
+          enum:
+            - ON_WARRANTY
+            - USE_WARRANTY
+            - REMOVED_FROM_WARRANTY
+    UserOrdersResponse:
+      type: array
+      properties:
+        list:
+          type: array
+          writeOnly: true
+          items:
+            $ref: '#/components/schemas/UserOrderResponse'
+        empty:
+          type: boolean
+      items:
+        $ref: '#/components/schemas/UserOrderResponse'

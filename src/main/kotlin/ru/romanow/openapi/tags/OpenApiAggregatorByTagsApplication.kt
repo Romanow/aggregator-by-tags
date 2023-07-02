@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class OpenapiGeneratorByTagsApplication
+class OpenApiAggregatorByTagsApplication
 
 fun main(args: Array<String>) {
-    runApplication<OpenapiGeneratorByTagsApplication>(*args)
+    runApplication<OpenApiAggregatorByTagsApplication>(*args)
 }

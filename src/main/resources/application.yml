@@ -1,12 +1,18 @@
 spring:
-  application.name: openapi-generator-by-tags
+  application.name: openapi-aggregator-by-tags
   main.banner-mode: off
-  shell:
-    history:
-      enabled: false
 
 application:
   apis:
-    - name: core
-      file: openapi/core.yml
-      prefix: core
+    - name: store
+      file: openapi/store.yml
+      prefix: /store
+    - name: order
+      file: openapi/order.yml
+      prefix: /order
+    - name: warehouse
+      file: openapi/warehouse.yml
+      prefix: /warehouse
+    - name: warranty
+      file: openapi/warranty.yml
+      prefix: /warranty

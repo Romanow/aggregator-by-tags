@@ -1,0 +1,156 @@
+openapi: 3.0.1
+info:
+  title: Servers application
+  contact:
+    name: Romanov Alexey
+    url: https://romanow.github.io/
+    email: romanowalex@mail.ru
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+tags:
+  - name: Warranty API
+  - name: Read
+  - name: Modification
+paths:
+  /api/v1/warranty/{itemUid}:
+    get:
+      tags:
+        - Warranty API
+        - Read
+      summary: Check warranty status
+      operationId: warrantyInfo
+      parameters:
+        - name: itemUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Warranty information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WarrantyInfoResponse'
+        '404':
+          description: Warranty info not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Warranty API
+        - Modification
+      summary: Start warranty period
+      operationId: startWarranty
+      parameters:
+        - name: itemUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Warranty started for item
+    delete:
+      tags:
+        - Warranty API
+        - Modification
+      summary: Close warranty
+      operationId: stopWarranty
+      parameters:
+        - name: itemUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Warranty closed for item
+  /api/v1/warranty/{itemUid}/warranty:
+    post:
+      tags:
+        - Warranty API
+        - Modification
+      summary: Request warranty decision
+      operationId: warrantyRequest
+      parameters:
+        - name: itemUid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemWarrantyRequest'
+        required: true
+      responses:
+        '200':
+          description: Warranty decision
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderWarrantyResponse'
+        '400':
+          description: Bad request format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Warranty not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ItemWarrantyRequest:
+      required:
+        - availableCount
+        - reason
+      type: object
+      properties:
+        reason:
+          type: string
+        availableCount:
+          type: integer
+          format: int32
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    OrderWarrantyResponse:
+      required:
+        - decision
+        - warrantyDate
+      type: object
+      properties:
+        warrantyDate:
+          type: string
+        decision:
+          type: string
+    WarrantyInfoResponse:
+      required:
+        - itemUid
+        - status
+        - warrantyDate
+      type: object
+      properties:
+        itemUid:
+          type: string
+          format: uuid
+        warrantyDate:
+          type: string
+        status:
+          type: string
