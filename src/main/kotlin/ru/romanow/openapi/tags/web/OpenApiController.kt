@@ -22,244 +22,29 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import ru.romanow.openapi.tags.config.properties.ApplicationProperties
+import ru.romanow.openapi.tags.service.OpenApiAggregatorService
 import java.math.BigDecimal
 import java.util.*
 
 @RestController
 @RequestMapping("/api/v1/openapi")
-class OpenApiController(private val applicationProperties: ApplicationProperties) {
-    private val logger = LoggerFactory.getLogger(OpenApiController::class.java)
+class OpenApiController(
+    private val openApiAggregatorService: OpenApiAggregatorService,
+    private val applicationProperties: ApplicationProperties
+) {
 
     @GetMapping(produces = [MediaType.TEXT_PLAIN_VALUE])
     fun all() = applicationProperties.apis.map { it.name }
 
     @GetMapping(value = ["/{name}"], produces = [MediaType.TEXT_PLAIN_VALUE])
-    fun get(@PathVariable name: String) =
-        applicationProperties.apis
-            .findLast { name == it.name }!!.file
-            .inputStream.readAllBytes()
-            .decodeToString()
+    fun get(@PathVariable name: String) = openApiAggregatorService.findOpenApiByName(name)
 
     @GetMapping(value = ["/all"], produces = [MediaType.TEXT_PLAIN_VALUE])
     fun all(
-        @RequestParam(required = false) include: List<String>?,
-        @RequestParam(required = false) exclude: List<String>?
+        @RequestParam(required = false) include: Set<String>?,
+        @RequestParam(required = false) exclude: Set<String>?
     ): String {
-        val openApi = OpenAPI()
-
-        val reader = Yaml.mapper().reader()
-        val apis = mutableMapOf<String, OpenAPI>()
-        for (api in applicationProperties.apis) {
-            apis[api.name] = reader.readValue(api.file.inputStream, OpenAPI::class.java)
-        }
-
-        val tags: Set<Tag> = apis
-            .values
-            .flatMap { it.tags }
-            .filter {
-                if (!include.isNullOrEmpty()) {
-                    return@filter include.contains(it.name)
-                } else if (!exclude.isNullOrEmpty()) {
-                    return@filter !exclude.contains(it.name)
-                }
-                return@filter true
-            }.toSet()
-
-        openApi.info = info()
-        openApi.servers = servers()
-        openApi.security = security()
-
-        openApi.paths = Paths()
-        openApi.components = Components()
-        for ((name, api) in apis.entries) {
-            val (_, prefix, _) = applicationProperties.apis.first { it.name == name }
-            copyOpenApi(openApi, prefix, api, tags)
-        }
-
+        val openApi = openApiAggregatorService.aggregateOpenApi(include, exclude)
         return Yaml.pretty().writeValueAsString(openApi)
-    }
-
-    private fun copyOpenApi(dest: OpenAPI, prefix: String?, source: OpenAPI, tags: Set<Tag>) {
-        val components = source.components
-
-        // Tags
-        copyTags(source, dest, tags)
-
-        // Paths
-        val usedSchemas = copyPaths(source, dest, prefix, tags)
-
-        // Headers
-        copyHeaders(dest, components)
-
-        // Parameters
-        copyParameters(dest, components)
-
-        // Request Body
-        copyRequestBodies(dest, components)
-
-        // Response
-        copyResponses(dest, components)
-
-        // Schema
-        copySchemas(dest, components, usedSchemas)
-
-        // Security Schemes
-        copySecuritySchemas(dest, components)
-    }
-
-    private fun copyTags(source: OpenAPI, dest: OpenAPI, tags: Set<Tag>) {
-        source.tags.toSet()
-            .filter { it in tags && (dest.tags == null || it !in dest.tags) }
-            .forEach { dest.addTagsItem(it) }
-    }
-
-    private fun copyPaths(source: OpenAPI, dest: OpenAPI, prefix: String?, tags: Set<Tag>): Set<String> {
-        val schemas: HashSet<String> = HashSet()
-
-        source.paths?.forEach { (name, path) ->
-            for ((method, operation) in path.readOperationsMap()) {
-                if (tags.map { it.name }.containsAll(operation.tags)) {
-                    operation.requestBody
-                        ?.content
-                        ?.values
-                        ?.forEach { schemas += schemaName(it.schema) }
-
-                    operation.responses
-                        ?.values
-                        ?.filter { it.content != null }
-                        ?.flatMap { it.content.values }
-                        ?.forEach { schemas += schemaName(it.schema) }
-
-                    modifyOperation(operation)
-                } else {
-                    logger.warn("Remove operation {} {} with tags {}", method.name, name, operation.tags)
-                    removeOperation(method.name.lowercase(), path)
-                }
-            }
-
-            if (path.readOperations().any { it != null }) {
-                dest.path(prefix + name, path)
-            }
-        }
-        return schemas
-    }
-
-    private fun schemaName(schema: Schema<*>) =
-        if (schema.`$ref` != null) {
-            schema.`$ref`.substringAfterLast("/")
-        } else {
-            schema.items.`$ref`.substringAfterLast("/")
-        }
-
-    private fun removeOperation(methodName: String, path: PathItem) {
-        val methodField = ReflectionUtils.findField(PathItem::class.java, methodName.lowercase())
-            ?: throw IllegalArgumentException("Field ${methodName.lowercase()} not found")
-
-        methodField.isAccessible = true
-        ReflectionUtils.setField(methodField, path, null)
-    }
-
-    private fun copyHeaders(openApi: OpenAPI, components: Components) {
-        components.headers?.forEach { (name, header) ->
-            openApi.components.addHeaders(name, header)
-        }
-    }
-
-    private fun copyParameters(openApi: OpenAPI, components: Components) {
-        components.parameters?.forEach { (name, parameter) ->
-            updateSchema(parameter.schema)
-            openApi.components.addParameters(name, parameter)
-        }
-    }
-
-    private fun copyRequestBodies(openApi: OpenAPI, components: Components) {
-        components.requestBodies?.forEach { (name, requestBody) ->
-            openApi.components.addRequestBodies(name, requestBody)
-        }
-    }
-
-    private fun copyResponses(openApi: OpenAPI, components: Components) {
-        components.responses?.forEach { (name, response) ->
-            openApi.components.addResponses(name, response)
-        }
-    }
-
-    private fun copySchemas(openApi: OpenAPI, components: Components, schemas: Set<String>) {
-        components.schemas
-            ?.filter { it.key in schemas }
-            ?.forEach { (name, schema) ->
-                schema.additionalProperties = false
-                openApi.components.addSchemas(name, schema)
-            }
-    }
-
-    private fun copySecuritySchemas(openApi: OpenAPI, components: Components) {
-        components.securitySchemes?.forEach { (name, securityScheme) ->
-            openApi.components.addSecuritySchemes(name, securityScheme)
-        }
-    }
-
-    private fun modifyOperation(operation: Operation) {
-        if (operation.responses.containsKey("200")) {
-            val content = operation.responses["200"]?.content
-            if (content != null && content.containsKey(MediaType.APPLICATION_JSON_VALUE)) {
-                val schema = content[MediaType.APPLICATION_JSON_VALUE]?.schema
-                if (schema?.type != null) {
-                    updateSchema(schema)
-                }
-            }
-        }
-    }
-
-    private fun updateSchema(property: Schema<*>?) {
-        when (property?.type) {
-            ARRAY -> {
-                val arraySchema = property as ArraySchema
-                property.setMaxItems(Int.MAX_VALUE)
-                if (arraySchema.items.type != null) {
-                    updateSchema(arraySchema.items)
-                }
-            }
-
-            NUMBER, INTEGER -> {
-                property.maximum = BigDecimal.valueOf(Int.MAX_VALUE.toLong(), 0)
-                property.minimum = BigDecimal.valueOf(Int.MIN_VALUE.toLong(), 0)
-            }
-
-            STRING -> {
-                if (property.format == UUID_FORMAT) {
-                    property.format = null
-                    property.pattern = UUID_PATTERN
-                }
-                property.maxLength = MAX_LENGTH
-            }
-        }
-    }
-
-    private fun servers() = listOf(Server().url("http://localhost:8080").description("Local server"))
-
-    private fun security() = listOf<SecurityRequirement>()
-
-    private fun info(): Info {
-        return Info()
-            .title("OpenAPI aggregator by Tags")
-            .description("Concatenate multiple OpenAPI in one file with Include and exclude tags")
-            .contact(
-                Contact()
-                    .email("romanowalex@mail.ru")
-                    .name("Romanov Alexey")
-                    .url("https://romanow.github.io/")
-            )
-            .version("1.0.0")
-    }
-
-    companion object {
-        private const val MAX_LENGTH = 255
-        private const val UUID_PATTERN = "\\b[0-9a-f]{8}\\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\\b[0-9a-f]{12}\\b"
-        private const val UUID_FORMAT = "uuid"
-        private const val INTEGER = "integer"
-        private const val ARRAY = "array"
-        private const val STRING = "string"
-        private const val NUMBER = "number"
     }
 }
