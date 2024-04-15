@@ -10,6 +10,6 @@ data class ApplicationProperties(
 
 data class OpenApiProperties(
     val name: String,
-    val prefix: String ?= null,
+    val prefix: String? = null,
     val file: ClassPathResource,
 )
