@@ -18,7 +18,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
-import ru.romanow.openapi.tags.config.properties.ApplicationProperties
+import org.springframework.web.servlet.function.RequestPredicates.contentType
 import java.util.stream.Stream
 
 @ActiveProfiles("test")
@@ -29,18 +29,15 @@ internal class OpenApiAggregatorByTagsApplicationTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @Autowired
-    private lateinit var applicationProperties: ApplicationProperties
-
     @ParameterizedTest
     @ArgumentsSource(ValueProvider::class)
     fun testAll(path: String, file: String) {
         val yaml = ClassPathResource("openapi/$file")
             .inputStream.readAllBytes()
             .decodeToString()
-        val targetOpenApi = Yaml.mapper().readValue(yaml, OpenAPI::class.java)
+        val expectedOpenApi = Yaml.mapper().readValue(yaml, OpenAPI::class.java)
 
-        val openApi = mockMvc.get("/api/v1/openapi/$path") { accept(MediaType.TEXT_PLAIN) }
+        val actualOpenApi = mockMvc.get("/api/v1/openapi/$path") { accept(MediaType.TEXT_PLAIN) }
             .andExpect {
                 status { isOk() }
                 content { contentType(MediaType.valueOf("text/plain;charset=UTF-8")) }
@@ -50,33 +47,37 @@ internal class OpenApiAggregatorByTagsApplicationTest {
             .contentAsString
             .let { Yaml.mapper().readValue(it, OpenAPI::class.java) }
 
-        assertThat(openApi).isEqualTo(targetOpenApi)
+        assertThat(actualOpenApi).isEqualTo(expectedOpenApi)
     }
 
     @ParameterizedTest
     @ValueSource(strings = ["store", "orders", "warehouse", "warranty"])
     fun testGetByName(name: String) {
-        val yaml = applicationProperties.apis[name]!!
-            .local!!.inputStream.readAllBytes()
+        val yaml = ClassPathResource("openapi/$name.yml")
+            .inputStream.readAllBytes()
             .decodeToString()
+        val expectedOpenApi = Yaml.mapper().readValue(yaml, OpenAPI::class.java)
 
-        mockMvc.get("/api/v1/openapi/$name") { accept(MediaType.TEXT_PLAIN) }
+        val actualOpenApi = mockMvc.get("/api/v1/openapi/$name") { accept(MediaType.TEXT_PLAIN) }
             .andExpect {
                 status { isOk() }
-                content {
-                    contentType(MediaType.valueOf("text/plain;charset=UTF-8"))
-                    string(yaml)
-                }
+                contentType(MediaType.valueOf("text/plain;charset=UTF-8"))
             }
-    }
+            .andReturn()
+            .response
+            .contentAsString
+            .let { Yaml.mapper().readValue(it, OpenAPI::class.java) }
 
-    internal class ValueProvider : ArgumentsProvider {
-        override fun provideArguments(context: ExtensionContext): Stream<Arguments> =
-            Stream.of(
-                of("all", "all.yml"),
-                of("all?include=Read,Store API,Order API", "include.yml"),
-                of("all?exclude=Modification,Warranty API", "exclude.yml"),
-                of("all?exclude=Read,Modification", "empty.yml")
-            )
+        assertThat(actualOpenApi).isEqualTo(expectedOpenApi)
     }
+}
+
+internal class ValueProvider : ArgumentsProvider {
+    override fun provideArguments(context: ExtensionContext): Stream<Arguments> =
+        Stream.of(
+            of("all", "all.yml"),
+            of("all?include=Read,Store API,Order API", "include.yml"),
+            of("all?exclude=Modification,Warranty API", "exclude.yml"),
+            of("all?exclude=Read,Modification", "empty.yml")
+        )
 }

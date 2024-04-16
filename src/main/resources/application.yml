@@ -8,7 +8,6 @@ spring:
     active: local
     include: openapi
 
-
 application:
   config:
     reload:
