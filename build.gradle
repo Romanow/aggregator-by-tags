@@ -11,7 +11,6 @@ plugins {
 
 ext {
     springBootVersion = "3.2.4"
-    springCloudVersion = "3.1.1"
     openApiVersion = "2.5.0"
 }
 
@@ -25,7 +24,6 @@ idea {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
-        mavenBom "org.springframework.cloud:spring-cloud-kubernetes-dependencies:$springCloudVersion"
     }
 }
 
@@ -39,7 +37,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-logging"
-    implementation "org.springframework.cloud:spring-cloud-starter-kubernetes-client-config"
 
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-api:$openApiVersion"
 
@@ -47,7 +44,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect"
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
 
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    kapt "org.springframework.boot:spring-boot-configuration-processor"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.junit.jupiter:junit-jupiter-params"

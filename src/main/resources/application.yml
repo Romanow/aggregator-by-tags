@@ -1,18 +1,28 @@
 spring:
-  application.name: openapi-aggregator-by-tags
+  application:
+    name: openapi-aggregator-by-tags
   main.banner-mode: off
+  config:
+    import: optional:git.properties
+  profiles:
+    active: local
+    include: openapi
+
 
 application:
-  apis:
-    - name: store
-      file: openapi/store.yml
-      prefix: /store
-    - name: orders
-      file: openapi/orders.yml
-      prefix: /orders
-    - name: warehouse
-      file: openapi/warehouse.yml
-      prefix: /warehouse
-    - name: warranty
-      file: openapi/warranty.yml
-      prefix: /warranty
+  config:
+    reload:
+      enabled: true
+      interval: PT30S
+
+management:
+  endpoint.health.probes.enabled: true
+  endpoints:
+    web:
+      base-path: /manage
+      exposure.include: info,health,loggers
+  endpoint.health.show-details: always
+  info.git.mode: simple
+  health:
+    readinessstate.enabled: true
+    livenessstate.enabled: true

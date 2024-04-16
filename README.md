@@ -1,6 +1,7 @@
 # OpenAPI aggregator by Tags
 
 [![Build project](https://github.com/Romanow/openapi-aggregator-by-tags/actions/workflows/build.yml/badge.svg)](https://github.com/Romanow/openapi-aggregator-by-tags/actions/workflows/build.yml)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
 Генерация агрегированного OpenAPI по нескольким файлам:
 
@@ -19,8 +20,13 @@
 * Фильтрация выполняется только в блоке `schemas`, т.к. [springdoc](https://springdoc.org/) при генерации добавляет все
   объекты туда, но не заполняет `headers`, `parameters`, `requestBodies`, `responses`.
 
-### Важное замечание
+> ⚠️ **Важное замечание**
+>
+> При генерации OpenAPI с правилами фильтрации _требуется перечитывать_ декларации OpenAPI из файла, т.к. при удалении
+> метода он помечается `null`, а это влияет на `apis: Map<String, OpenAPI>`, который создается только один раз при
+> инициализации приложения.
 
-При генерации OpenAPI с правилами фильтрации _требуется перечитывать_ декларации OpenAPI из файла, т.к. при удалении
-метода он помечается `null`, а это влияет на `apis: Map<String, OpenAPI>`, который создается только один раз при
-инициализации приложения.
+## TODO
+
+* [ ] Запустить `openapi-aggregator-by-tags` в кластере.
+* [ ] Опубликовать OpenAPI как ConfigMap.

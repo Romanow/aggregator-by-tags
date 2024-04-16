@@ -56,9 +56,8 @@ internal class OpenApiAggregatorByTagsApplicationTest {
     @ParameterizedTest
     @ValueSource(strings = ["store", "orders", "warehouse", "warranty"])
     fun testGetByName(name: String) {
-        val yaml = applicationProperties.apis
-            .first { it.name == name }.file
-            .inputStream.readAllBytes()
+        val yaml = applicationProperties.apis[name]!!
+            .local!!.inputStream.readAllBytes()
             .decodeToString()
 
         mockMvc.get("/api/v1/openapi/$name") { accept(MediaType.TEXT_PLAIN) }

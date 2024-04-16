@@ -23,26 +23,19 @@ import java.math.BigDecimal
 
 @Service
 class OpenApiAggregatorServiceImpl(
-    private val applicationProperties: ApplicationProperties
+    private val applicationProperties: ApplicationProperties,
+    private val apis: Map<String, OpenAPI>
 ) : OpenApiAggregatorService {
 
     private val logger = LoggerFactory.getLogger(OpenApiController::class.java)
 
-    override fun findOpenApiByName(name: String) =
-        applicationProperties.apis
-            .findLast { name == it.name }!!.file
-            .inputStream.readAllBytes()
-            .decodeToString()
+    override fun findOpenApiByName(name: String): String =
+        Yaml.pretty().writeValueAsString(apis[name])
 
     override fun aggregateOpenApi(include: Set<String>?, exclude: Set<String>?): OpenAPI {
         val openApi = OpenAPI()
 
-        val reader = Yaml.mapper().reader()
-        val apis = mutableMapOf<String, OpenAPI>()
-        for (api in applicationProperties.apis) {
-            apis[api.name] = reader.readValue(api.file.inputStream, OpenAPI::class.java)
-        }
-
+        val apis = readOpenApis(applicationProperties)
         val tags: Set<Tag> = apis
             .values
             .flatMap { it.tags }
@@ -62,7 +55,7 @@ class OpenApiAggregatorServiceImpl(
         openApi.paths = Paths()
         openApi.components = Components()
         for ((name, api) in apis.entries) {
-            val (_, prefix, _) = applicationProperties.apis.first { it.name == name }
+            val (_, prefix, _) = applicationProperties.apis[name]!!
             copyOpenApi(openApi, prefix, api, tags)
         }
         return openApi

@@ -1,0 +1,17 @@
+image:
+  repository: romanowalex/openapi-aggregator-by-tags
+  tag: v1.0
+
+profile: k8s
+
+ports:
+  internal: 8080
+  external: 32080
+
+resources:
+  requests:
+    cpu: 1
+    memory: 1024Mi
+  limits:
+    cpu: 1
+    memory: 1024Mi

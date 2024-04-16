@@ -2,14 +2,16 @@ package ru.romanow.openapi.tags.config.properties
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.UrlResource
 
 @ConfigurationProperties("application")
 data class ApplicationProperties(
-    val apis: List<OpenApiProperties>
+    var apis: Map<String, OpenApiConfig>
 )
 
-data class OpenApiProperties(
-    val name: String,
+data class OpenApiConfig(
+    val name: String? = null,
     val prefix: String? = null,
-    val file: ClassPathResource,
+    val local: ClassPathResource? = null,
+    val external: UrlResource? = null
 )

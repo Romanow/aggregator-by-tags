@@ -1,0 +1,15 @@
+application:
+  apis:
+    store:
+      local: openapi/store.yml
+      external: file:///tmp/a.yml
+      prefix: /store
+    orders:
+      local: openapi/orders.yml
+      prefix: /orders
+    warehouse:
+      local: openapi/warehouse.yml
+      prefix: /warehouse
+    warranty:
+      local: openapi/warranty.yml
+      prefix: /warranty

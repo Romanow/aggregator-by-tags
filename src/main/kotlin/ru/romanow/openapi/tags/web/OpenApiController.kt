@@ -19,7 +19,7 @@ class OpenApiController(
 ) {
 
     @GetMapping(produces = [MediaType.TEXT_PLAIN_VALUE])
-    fun all() = applicationProperties.apis.map { it.name }
+    fun all() = applicationProperties.apis.keys
 
     @GetMapping(value = ["/{name}"], produces = [MediaType.TEXT_PLAIN_VALUE])
     fun get(@PathVariable name: String) = openApiAggregatorService.findOpenApiByName(name)
