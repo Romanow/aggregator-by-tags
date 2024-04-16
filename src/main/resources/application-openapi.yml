@@ -2,7 +2,7 @@ application:
   apis:
     store:
       local: openapi/store.yml
-      external: file:///tmp/a.yml
+      external: file:///opt/openapi/store/store.yml
       prefix: /store
     orders:
       local: openapi/orders.yml

@@ -31,37 +31,36 @@ class ConfigMonitor(
     @PostConstruct
     fun init() {
         applicationProperties.apis
-            .filter { (_, config) -> resourceAvailable(config.external) }
+            .filter { (_, config) -> config.external != null }
             .forEach { (name, _) -> filesUnderMonitor[name] = LocalDateTime.now() }
     }
 
     @Scheduled(fixedDelayString = "\${application.config.reload.interval}", initialDelayString = "PT10S")
     fun executeCycle() {
         val updatedFiles = mutableListOf<String>()
-        val apis = applicationProperties.apis.filter { (_, config) -> resourceAvailable(config.external) }
-        for ((name, config) in apis) {
-            val resource = config.external
-            if (filesUnderMonitor.containsKey(name)) {
-                val attributes = readAttributes(resource!!.file.toPath(), BasicFileAttributes::class.java)
+        for (name in filesUnderMonitor.keys) {
+            val config = applicationProperties.apis[name]!!
+            if (resourceAvailable(config.external)) {
+                logger.info("Processing file $config")
+
+                val attributes = readAttributes(config.external!!.file.toPath(), BasicFileAttributes::class.java)
                 val lastModifiedTime =
                     LocalDateTime.ofInstant(attributes.lastModifiedTime().toInstant(), systemDefault())
 
+                logger.info("Check '$name' (${filesUnderMonitor[name]}) update time:  $lastModifiedTime")
                 if (filesUnderMonitor[name]!!.isBefore(lastModifiedTime)) {
                     filesUnderMonitor[name] = lastModifiedTime
-                    updatedFiles.add(resource.filename!!)
+                    updatedFiles.add(config.external.filename!!)
                 }
             }
         }
 
         if (updatedFiles.isNotEmpty()) {
-            logger.info("Files {} updated, reload config", updatedFiles)
-            reloadOpenApi()
-        }
-    }
+            logger.info("Files {} updated, reload OpenAPI map", updatedFiles)
 
-    private fun reloadOpenApi() {
-        val registry = applicationContext.autowireCapableBeanFactory as DefaultSingletonBeanRegistry
-        registry.destroySingleton(OPENAPI_MAP_BEAN_NAME)
-        registry.registerSingleton(OPENAPI_MAP_BEAN_NAME, readOpenApis(applicationProperties))
+            val registry = applicationContext.autowireCapableBeanFactory as DefaultSingletonBeanRegistry
+            registry.destroySingleton(OPENAPI_MAP_BEAN_NAME)
+            registry.registerSingleton(OPENAPI_MAP_BEAN_NAME, readOpenApis(applicationProperties))
+        }
     }
 }

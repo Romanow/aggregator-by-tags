@@ -8,6 +8,10 @@ ports:
   internal: 8080
   external: 32080
 
+configVolumes:
+  - name: store-openapi-config
+    mount: /opt/openapi/store
+
 resources:
   requests:
     cpu: 1
