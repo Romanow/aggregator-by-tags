@@ -1,8 +1,8 @@
 package ru.romanow.openapi.tags.service
 
+import io.swagger.v3.oas.models.OpenAPI
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.support.DefaultSingletonBeanRegistry
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.ApplicationContext
 import org.springframework.scheduling.annotation.Scheduled
@@ -47,8 +47,9 @@ class ConfigMonitor(
                 val lastModifiedTime =
                     LocalDateTime.ofInstant(attributes.lastModifiedTime().toInstant(), systemDefault())
 
-                logger.info("Check '$name' (${filesUnderMonitor[name]}) update time:  $lastModifiedTime")
-                if (filesUnderMonitor[name]!!.isBefore(lastModifiedTime)) {
+                val isFileModified = filesUnderMonitor[name]!!.isBefore(lastModifiedTime)
+                logger.info("Check '$name' update time: $lastModifiedTime, result: $isFileModified")
+                if (isFileModified) {
                     filesUnderMonitor[name] = lastModifiedTime
                     updatedFiles.add(config.external.filename!!)
                 }
@@ -57,10 +58,9 @@ class ConfigMonitor(
 
         if (updatedFiles.isNotEmpty()) {
             logger.info("Files {} updated, reload OpenAPI map", updatedFiles)
-
-            val registry = applicationContext.autowireCapableBeanFactory as DefaultSingletonBeanRegistry
-            registry.destroySingleton(OPENAPI_MAP_BEAN_NAME)
-            registry.registerSingleton(OPENAPI_MAP_BEAN_NAME, readOpenApis(applicationProperties))
+            val apis = applicationContext.getBean(OPENAPI_MAP_BEAN_NAME, mutableMapOf<String, OpenAPI>()::class.java)
+            apis.clear()
+            apis.putAll(readOpenApis(applicationProperties))
         }
     }
 }
