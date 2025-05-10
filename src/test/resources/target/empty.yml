@@ -1,20 +1,14 @@
 openapi: 3.0.1
 info:
-  title: OpenAPI aggregator by Tags
-  description: Concatenate multiple OpenAPI in one file with Include and exclude tags
-  contact:
-    name: Romanov Alexey
-    url: https://romanow.github.io/
-    email: romanowalex@mail.ru
+  title: Application
   version: 1.0.0
 servers:
   - url: http://localhost:8080
-    description: Local server
 security: []
-tags:
-  - name: Store API
-  - name: Order API
-  - name: Warehouse API
-  - name: Warranty API
 paths: {}
-components: {}
+components:
+  securitySchemes:
+    TokenBasedAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

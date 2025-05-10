@@ -3,15 +3,15 @@ plugins {
     id "jacoco"
     id "maven-publish"
     id "org.jetbrains.kotlin.jvm" version "1.9.25"
-    id "org.jlleitschuh.gradle.ktlint" version "12.1.1"
+    id "org.jlleitschuh.gradle.ktlint" version "12.2.0"
 }
 
 ext {
     kotlinVersion = "1.9.25"
     openApiVersion = "2.5.0"
     junitVersion = "5.11.0"
-    assertjVersion = "3.26.3"
-    slf4jVersion = "2.0.16"
+    assertjVersion = "3.27.3"
+    slf4jVersion = "2.0.17"
     logbackVersion = "1.5.8"
 }
 
@@ -88,7 +88,7 @@ publishing {
     }
     repositories {
         maven {
-            url = uri("https://maven.pkg.github.com/Romanow/playwright-page-object")
+            url = uri("https://maven.pkg.github.com/Romanow/aggregator-by-tags")
             credentials {
                 username = System.getenv("GITHUB_USER")
                 password = System.getenv("GITHUB_TOKEN")

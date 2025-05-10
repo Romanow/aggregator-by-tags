@@ -22,13 +22,13 @@ internal class OpenApiAggregatorServiceTest {
         val expectedOpenApi = Yaml.mapper().readValue(yaml, OpenAPI::class.java)
 
         val declarations = listOf(
-            "/store" to "source/store.yml",
-            "/orders" to "source/orders.yml",
-            "/warehouse" to "source/warehouse.yml",
-            "/warranty" to "source/warranty.yml"
+            "/store" to "source/store-service.yml",
+            "/warehouse" to "source/warehouse-service.yml",
+            "/warranty" to "source/warranty-service.yml"
         )
         val actualOpenApi = openApiAggregatorService.aggregateOpenApi(declarations, include, exclude)
 
+        println(actualOpenApi.openapi)
         assertThat(actualOpenApi).isEqualTo(expectedOpenApi)
     }
 }
@@ -37,8 +37,8 @@ internal class ValueProvider : ArgumentsProvider {
     override fun provideArguments(context: ExtensionContext): Stream<Arguments> =
         Stream.of(
             of(setOf<String>(), setOf<String>(), "target/all.yml"),
-            of(setOf("Read", "Store API", "Order API"), setOf<String>(), "target/include.yml"),
-            of(setOf<String>(), setOf("Modification", "Warranty API"), "target/exclude.yml"),
-            of(setOf<String>(), setOf("Read", "Modification"), "target/empty.yml")
+            of(setOf("Read", "public", "Order API"), setOf<String>(), "target/include.yml"),
+            of(setOf<String>(), setOf("private"), "target/exclude.yml"),
+            of(setOf<String>(), setOf("public", "private"), "target/empty.yml")
         )
 }

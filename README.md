@@ -5,6 +5,26 @@
 
 # OpenAPI aggregator by Tags
 
+## Подключение
+
+### Maven
+
+```xml
+<dependency>
+  <groupId>ru.romanow.openapi</groupId>
+  <artifactId>aggregator-by-tags</artifactId>
+  <version>${aggregator-by-tags.version}</version>
+</dependency>
+```
+
+### Gradle
+
+```groovy
+testImplementation "ru.romanow.openapi:aggregator-by-tags:$aggregatorByTagsVersion"
+```
+
+## Реализация
+
 Генерация агрегированного OpenAPI по нескольким файлам:
 
 1. Если ничего не задано, то результатом будет конкатенированный OpenAPI.

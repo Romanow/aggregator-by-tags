@@ -3,67 +3,70 @@ package ru.romanow.openapi.aggregator
 import io.swagger.v3.core.util.Yaml
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.Paths
-import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.servers.Server
-import io.swagger.v3.oas.models.tags.Tag
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ClassPathResource
-import org.springframework.http.MediaType
 import org.springframework.util.ReflectionUtils
-import java.math.BigDecimal
+import ru.romanow.openapi.aggregator.DefaultOpenApiAggregatorService.FilterType.*
+import java.util.*
+import java.util.Objects.equals
+import java.util.Set.copyOf
 
 class DefaultOpenApiAggregatorService : OpenApiAggregatorService {
-
     private val logger = LoggerFactory.getLogger(OpenApiAggregatorService::class.java)
 
     override fun aggregateOpenApi(
         declarations: List<Pair<String, String>>,
         include: Set<String>?,
-        exclude: Set<String>?
+        exclude: Set<String>?,
+        info: Info, servers: List<Server>
     ): OpenAPI {
-        val openApi = OpenAPI()
+        val result = OpenAPI()
 
         val apis = readOpenApiMap(declarations)
-        val tags: Set<Tag> = apis
-            .values
-            .flatMap { it.tags }
-            .filter {
-                if (!include.isNullOrEmpty()) {
-                    return@filter include.contains(it.name)
-                } else if (!exclude.isNullOrEmpty()) {
-                    return@filter !exclude.contains(it.name)
-                }
-                return@filter true
-            }.toSet()
+        result.info = info
+        result.servers = servers
+        result.security = listOf<SecurityRequirement>()
 
-        openApi.info = info()
-        openApi.servers = servers()
-        openApi.security = security()
+        result.paths = Paths()
+        result.components = Components()
 
-        openApi.paths = Paths()
-        openApi.components = Components()
-        for ((prefix, api) in apis.entries) {
-
-            copyOpenApi(openApi, prefix, api, tags)
+        val filterType = when {
+            !include.isNullOrEmpty() -> INCLUDE
+            !exclude.isNullOrEmpty() -> EXCLUDE
+            else -> NONE
         }
-        return openApi
+        val tags = when (filterType) {
+            INCLUDE -> include
+            EXCLUDE -> exclude
+            else -> setOf()
+        }
+        apis.forEach { (prefix, source) ->
+            copyOpenApi(source, result, prefix, tags!!, filterType)
+        }
+        return result
     }
 
-    private fun copyOpenApi(dest: OpenAPI, prefix: String?, source: OpenAPI, tags: Set<Tag>) {
+    private fun copyOpenApi(
+        source: OpenAPI,
+        dest: OpenAPI,
+        prefix: String,
+        tags: Set<String>,
+        filterType: FilterType
+    ) {
         val components = source.components
 
-        // Tags
-        copyTags(source, dest, tags)
-
         // Paths
-        val usedSchemas = copyPaths(source, dest, prefix, tags)
+        val usedItems = copyPaths(source, dest, prefix, tags, filterType)
+
+        // Tags
+        copyTags(source, dest, usedItems.tags)
 
         // Headers
         copyHeaders(dest, components)
@@ -78,24 +81,27 @@ class DefaultOpenApiAggregatorService : OpenApiAggregatorService {
         copyResponses(dest, components)
 
         // Schema
-        copySchemas(dest, components, usedSchemas)
+        copySchemas(dest, components, usedItems.schemas)
 
         // Security Schemes
         copySecuritySchemas(dest, components)
     }
 
-    private fun copyTags(source: OpenAPI, dest: OpenAPI, tags: Set<Tag>) {
-        source.tags.toSet()
-            .filter { it in tags && (dest.tags == null || it !in dest.tags) }
-            .forEach { dest.addTagsItem(it) }
+    private fun copyTags(source: OpenAPI, dest: OpenAPI, tags: Set<String>) {
+        source.tags?.toSet()
+            ?.filter { it.name in tags && (dest.tags == null || it !in dest.tags) }
+            ?.forEach { dest.addTagsItem(it) }
     }
 
-    private fun copyPaths(source: OpenAPI, dest: OpenAPI, prefix: String?, tags: Set<Tag>): MutableSet<String> {
+    private fun copyPaths(
+        source: OpenAPI, dest: OpenAPI, prefix: String, filters: Set<String>, filterType: FilterType
+    ): UsedItems {
         val schemas = mutableSetOf<String>()
+        val tags = mutableSetOf<String>()
 
         source.paths?.forEach { (name, path) ->
             for ((method, operation) in path.readOperationsMap()) {
-                if (tags.map { it.name }.containsAll(operation.tags)) {
+                if (isOperationAllowed(operation.tags, filters, filterType)) {
                     operation.requestBody
                         ?.content
                         ?.values
@@ -110,10 +116,10 @@ class DefaultOpenApiAggregatorService : OpenApiAggregatorService {
                     operation.parameters
                         ?.forEach { schemas += calculateUsedSchemas(it.schema) }
 
-                    modifyOperation(operation)
+                    tags.addAll(operation.tags)
                 } else {
-                    logger.warn("Remove operation {} {} with tags {}", method.name, name, operation.tags)
-                    removeOperation(method.name.lowercase(), path)
+                    logger.warn("Remove operation {} {} with tags {}", method, name, operation.tags)
+                    removeOperation(method.name.lowercase(Locale.getDefault()), path)
                 }
             }
 
@@ -121,7 +127,25 @@ class DefaultOpenApiAggregatorService : OpenApiAggregatorService {
                 dest.path(prefix + name, path)
             }
         }
-        return schemas
+
+        return UsedItems(schemas, tags)
+    }
+
+    private fun isOperationAllowed(
+        operationTags: List<String>?,
+        filters: Set<String>, filterType: FilterType
+    ): Boolean {
+        if (filterType == INCLUDE) {
+            // Если операция с тегом должна быть включена в результат, то он должен
+            // присутствовать в списке тегов (список тегов операции должен быть не пустым)
+            return !operationTags.isNullOrEmpty() && filters.any { operationTags.contains(it) }
+        } else if (filterType == EXCLUDE) {
+            // Если теги не должны быть включены в результат, то ни один из них не должен
+            // присутствовать на методе (а значит пустой список тегов операции удовлетворяет этому условию)
+            return operationTags.isNullOrEmpty() || filters.none { operationTags.contains(it) }
+        }
+        // если нет никакой фильтрации, то метод безусловно включается в результат
+        return true
     }
 
     private fun removeOperation(methodName: String, path: PathItem) {
@@ -133,16 +157,11 @@ class DefaultOpenApiAggregatorService : OpenApiAggregatorService {
     }
 
     private fun copyHeaders(openApi: OpenAPI, components: Components) {
-        components.headers?.forEach { (name, header) ->
-            openApi.components.addHeaders(name, header)
-        }
+        components.headers?.forEach { (name, header) -> openApi.components.addHeaders(name, header) }
     }
 
     private fun copyParameters(openApi: OpenAPI, components: Components) {
-        components.parameters?.forEach { (name, parameter) ->
-            updateSchema(parameter.schema)
-            openApi.components.addParameters(name, parameter)
-        }
+        components.parameters?.forEach { (name, parameter) -> openApi.components.addParameters(name, parameter) }
     }
 
     private fun copyRequestBodies(openApi: OpenAPI, components: Components) {
@@ -152,9 +171,7 @@ class DefaultOpenApiAggregatorService : OpenApiAggregatorService {
     }
 
     private fun copyResponses(openApi: OpenAPI, components: Components) {
-        components.responses?.forEach { (name, response) ->
-            openApi.components.addResponses(name, response)
-        }
+        components.responses?.forEach { (name, response) -> openApi.components.addResponses(name, response) }
     }
 
     private fun copySchemas(openApi: OpenAPI, components: Components, usedSchemas: MutableSet<String>) {
@@ -165,8 +182,8 @@ class DefaultOpenApiAggregatorService : OpenApiAggregatorService {
         val schemas = components.schemas
         if (schemas != null) {
             val processedSchemas = mutableSetOf<String>()
-            while (processedSchemas != usedSchemas) {
-                for (schemaName in java.util.Set.copyOf(usedSchemas)) {
+            while (!equals(processedSchemas, usedSchemas)) {
+                for (schemaName in copyOf(usedSchemas)) {
                     if (schemaName !in processedSchemas) {
                         val schema = schemas[schemaName]!!
                         usedSchemas.addAll(calculateUsedSchemas(schema))
@@ -207,60 +224,6 @@ class DefaultOpenApiAggregatorService : OpenApiAggregatorService {
         }
     }
 
-    private fun modifyOperation(operation: Operation) {
-        if (operation.responses.containsKey("200")) {
-            val content = operation.responses["200"]?.content
-            if (content != null && content.containsKey(MediaType.APPLICATION_JSON_VALUE)) {
-                val schema = content[MediaType.APPLICATION_JSON_VALUE]?.schema
-                if (schema?.type != null) {
-                    updateSchema(schema)
-                }
-            }
-        }
-    }
-
-    private fun updateSchema(property: Schema<*>?) {
-        when (property?.type) {
-            ARRAY -> {
-                val arraySchema = property as ArraySchema
-                property.setMaxItems(Int.MAX_VALUE)
-                if (arraySchema.items.type != null) {
-                    updateSchema(arraySchema.items)
-                }
-            }
-
-            NUMBER, INTEGER -> {
-                property.maximum = BigDecimal.valueOf(Int.MAX_VALUE.toLong(), 0)
-                property.minimum = BigDecimal.valueOf(Int.MIN_VALUE.toLong(), 0)
-            }
-
-            STRING -> {
-                if (property.format == UUID_FORMAT) {
-                    property.format = null
-                    property.pattern = UUID_PATTERN
-                }
-                property.maxLength = MAX_LENGTH
-            }
-        }
-    }
-
-    private fun servers() = listOf(Server().url("http://localhost:8080").description("Local server"))
-
-    private fun security() = listOf<SecurityRequirement>()
-
-    private fun info(): Info {
-        return Info()
-            .title("OpenAPI aggregator by Tags")
-            .description("Concatenate multiple OpenAPI in one file with Include and exclude tags")
-            .contact(
-                Contact()
-                    .email("romanowalex@mail.ru")
-                    .name("Romanov Alexey")
-                    .url("https://romanow.github.io/")
-            )
-            .version("1.0.0")
-    }
-
     private fun readOpenApiMap(apis: List<Pair<String, String>>): Map<String, OpenAPI> {
         val reader = Yaml.mapper().reader()
         return apis.associate {
@@ -268,13 +231,14 @@ class DefaultOpenApiAggregatorService : OpenApiAggregatorService {
         }
     }
 
-    companion object {
-        private const val MAX_LENGTH = 255
-        private const val UUID_PATTERN = "\\b[0-9a-f]{8}\\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\\b[0-9a-f]{12}\\b"
-        private const val UUID_FORMAT = "uuid"
-        private const val INTEGER = "integer"
-        private const val ARRAY = "array"
-        private const val STRING = "string"
-        private const val NUMBER = "number"
+    internal enum class FilterType {
+        INCLUDE,
+        EXCLUDE,
+        NONE
     }
+
+    internal data class UsedItems(
+        val schemas: MutableSet<String>,
+        val tags: MutableSet<String>
+    )
 }
