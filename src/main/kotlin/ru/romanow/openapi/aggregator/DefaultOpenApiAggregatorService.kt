@@ -1,4 +1,4 @@
-package ru.romanow.openapi.tags.service
+package ru.romanow.openapi.aggregator
 
 import io.swagger.v3.core.util.Yaml
 import io.swagger.v3.oas.models.Components
@@ -14,28 +14,23 @@ import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.tags.Tag
 import org.slf4j.LoggerFactory
+import org.springframework.core.io.ClassPathResource
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Service
 import org.springframework.util.ReflectionUtils
-import ru.romanow.openapi.tags.config.properties.ApplicationProperties
-import ru.romanow.openapi.tags.web.OpenApiController
 import java.math.BigDecimal
 
-@Service
-class OpenApiAggregatorServiceImpl(
-    private val applicationProperties: ApplicationProperties,
-    private val apis: Map<String, OpenAPI>
-) : OpenApiAggregatorService {
+class DefaultOpenApiAggregatorService : OpenApiAggregatorService {
 
-    private val logger = LoggerFactory.getLogger(OpenApiController::class.java)
+    private val logger = LoggerFactory.getLogger(OpenApiAggregatorService::class.java)
 
-    override fun findOpenApiByName(name: String): String =
-        Yaml.pretty().writeValueAsString(apis[name])
-
-    override fun aggregateOpenApi(include: Set<String>?, exclude: Set<String>?): OpenAPI {
+    override fun aggregateOpenApi(
+        declarations: List<Pair<String, String>>,
+        include: Set<String>?,
+        exclude: Set<String>?
+    ): OpenAPI {
         val openApi = OpenAPI()
 
-        val apis = readOpenApis(applicationProperties)
+        val apis = readOpenApiMap(declarations)
         val tags: Set<Tag> = apis
             .values
             .flatMap { it.tags }
@@ -54,8 +49,8 @@ class OpenApiAggregatorServiceImpl(
 
         openApi.paths = Paths()
         openApi.components = Components()
-        for ((name, api) in apis.entries) {
-            val (_, prefix, _) = applicationProperties.apis[name]!!
+        for ((prefix, api) in apis.entries) {
+
             copyOpenApi(openApi, prefix, api, tags)
         }
         return openApi
@@ -264,6 +259,13 @@ class OpenApiAggregatorServiceImpl(
                     .url("https://romanow.github.io/")
             )
             .version("1.0.0")
+    }
+
+    private fun readOpenApiMap(apis: List<Pair<String, String>>): Map<String, OpenAPI> {
+        val reader = Yaml.mapper().reader()
+        return apis.associate {
+            it.first to reader.readValue(ClassPathResource(it.second).inputStream, OpenAPI::class.java)
+        }
     }
 
     companion object {
