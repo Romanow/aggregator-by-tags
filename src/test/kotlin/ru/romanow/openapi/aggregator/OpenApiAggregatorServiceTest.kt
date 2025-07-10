@@ -27,8 +27,6 @@ internal class OpenApiAggregatorServiceTest {
             "/warranty" to "source/warranty-service.yml"
         )
         val actualOpenApi = openApiAggregatorService.aggregateOpenApi(declarations, include, exclude)
-
-        println(actualOpenApi.openapi)
         assertThat(actualOpenApi).isEqualTo(expectedOpenApi)
     }
 }
