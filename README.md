@@ -1,6 +1,7 @@
 [![CI](https://github.com/Romanow/aggregator-by-tags/actions/workflows/build.yml/badge.svg)](https://github.com/Romanow/aggregator-by-tags/actions/workflows/build.yml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Release](https://img.shields.io/github/v/release/Romanow/aggregator-by-tags?logo=github&sort=semver)](https://github.com/Romanow/aggregator-by-tags/releases/latest)
+[![Codecov](https://codecov.io/gh/Romanow/aggregator-by-tags/branch/master/graph/badge.svg?token=Cckw6pHLh7)](https://codecov.io/gh/Romanow/aggregator-by-tags)
 [![License](https://img.shields.io/github/license/Romanow/aggregator-by-tags)](https://github.com/Romanow/aggregator-by-tags/blob/master/LICENSE)
 
 # OpenAPI aggregator by Tags
@@ -11,7 +12,7 @@
 
 ```xml
 <dependency>
-  <groupId>ru.romanow.openapi</groupId>
+  <groupId>ru.romanow-alex</groupId>
   <artifactId>aggregator-by-tags</artifactId>
   <version>${aggregator-by-tags.version}</version>
 </dependency>
@@ -20,7 +21,7 @@
 ### Gradle
 
 ```groovy
-testImplementation "ru.romanow.openapi:aggregator-by-tags:$aggregatorByTagsVersion"
+testImplementation "ru.romanow-alex:aggregator-by-tags:$aggregatorByTagsVersion"
 ```
 
 ## Реализация
