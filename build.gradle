@@ -11,7 +11,7 @@ ext {
     kotlinVersion = "1.9.25"
     openApiVersion = "2.5.0"
     junitVersion = "5.11.0"
-    assertjVersion = "3.27.3"
+    assertjVersion = "3.27.4"
     slf4jVersion = "2.0.17"
     logbackVersion = "1.5.8"
 }
